@@ -3,7 +3,6 @@ import connectToDatabase from '../../../../lib/mongodb';
 import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { serialize } from 'cookie';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -62,15 +61,6 @@ export async function POST(request: Request) {
       { expiresIn: '7d' }
     );
 
-    // Set cookie
-    const cookie = serialize('auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-      path: '/',
-    });
-
     const response = NextResponse.json({
       success: true,
       user: {
@@ -88,7 +78,15 @@ export async function POST(request: Request) {
       }
     });
 
-    response.headers.set('Set-Cookie', cookie);
+    // Set cookie using NextResponse
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/',
+    });
+
     return response;
 
   } catch (error: any) {

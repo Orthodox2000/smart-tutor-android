@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export', // Uncomment for static export (Capacitor)
-  // distDir: 'dist',   // Ensure it matches Capacitor's webDir
+  distDir: 'dist',
   images: {
     unoptimized: true,
   },

@@ -1,0 +1,9 @@
+{
+  "name": "Smart Tutors",
+  "description": "Smart Tutors - Educational platform for excellence.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": []
+}

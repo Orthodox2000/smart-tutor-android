@@ -1,0 +1,15 @@
+node_modules/
+.next/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+/android
+android
+*.log
+.env*
+!.env.example
+public/
+firebase-blueprint.json 
+/firebase.rules

@@ -1,0 +1,157 @@
+{
+  "timestamp": "2026-07-16T12:13:58.628Z",
+  "passed": 8,
+  "failed": 17,
+  "results": [
+    {
+      "test": "GET /api/admin/stats returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:37.560Z"
+    },
+    {
+      "test": "GET /api/courses returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:39.491Z"
+    },
+    {
+      "test": "GET /api/sessions returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:41.352Z"
+    },
+    {
+      "test": "GET /api/messages returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:43.299Z"
+    },
+    {
+      "test": "GET /api/notifications returns 200",
+      "status": "FAIL",
+      "detail": "Status: 404",
+      "time": "2026-07-16T12:13:43.335Z"
+    },
+    {
+      "test": "GET /api/tests returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:45.220Z"
+    },
+    {
+      "test": "GET /api/digital-library returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:47.071Z"
+    },
+    {
+      "test": "GET /api/users returns 200",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:48.906Z"
+    },
+    {
+      "test": "POST /api/auth/login succeeds",
+      "status": "FAIL",
+      "detail": "Status: 400",
+      "time": "2026-07-16T12:13:49.163Z"
+    },
+    {
+      "test": "GET /api/auth/session returns user",
+      "status": "FAIL",
+      "detail": "Status: 404",
+      "time": "2026-07-16T12:13:49.189Z"
+    },
+    {
+      "test": "POST /api/auth/logout succeeds",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:49.413Z"
+    },
+    {
+      "test": "Invalid login returns 401",
+      "status": "PASS",
+      "detail": "Status: 400",
+      "time": "2026-07-16T12:13:49.670Z"
+    },
+    {
+      "test": "Empty login body handled",
+      "status": "PASS",
+      "detail": "Status: 400",
+      "time": "2026-07-16T12:13:49.900Z"
+    },
+    {
+      "test": "/api/courses returns array",
+      "status": "FAIL",
+      "detail": "Type: object",
+      "time": "2026-07-16T12:13:51.770Z"
+    },
+    {
+      "test": "/api/notifications returns expected shape",
+      "status": "FAIL",
+      "detail": "",
+      "time": "2026-07-16T12:13:51.787Z"
+    },
+    {
+      "test": "DELETE non-existent returns ok or 404",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:53.590Z"
+    },
+    {
+      "test": "Invalid query param handled",
+      "status": "FAIL",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:13:55.375Z"
+    },
+    {
+      "test": "5 concurrent requests all succeed",
+      "status": "FAIL",
+      "detail": "Statuses: 500, 500, 500, 500, 500",
+      "time": "2026-07-16T12:13:58.503Z"
+    },
+    {
+      "test": "Page /",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:58.528Z"
+    },
+    {
+      "test": "Page /courses",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:58.543Z"
+    },
+    {
+      "test": "Page /messages",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:58.559Z"
+    },
+    {
+      "test": "Page /notifications",
+      "status": "FAIL",
+      "detail": "Status: 404",
+      "time": "2026-07-16T12:13:58.576Z"
+    },
+    {
+      "test": "Page /settings",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:58.594Z"
+    },
+    {
+      "test": "Page /profile",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:13:58.609Z"
+    },
+    {
+      "test": "Page /attendance",
+      "status": "FAIL",
+      "detail": "Status: 404",
+      "time": "2026-07-16T12:13:58.627Z"
+    }
+  ]
+}

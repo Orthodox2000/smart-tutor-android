@@ -4,6 +4,8 @@ import User from '../../../../models/User';
 import Course from '../../../../models/Course'; 
 import Session from '../../../../models/Session';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     await connectToDatabase();
@@ -11,7 +13,7 @@ export async function GET() {
     const [studentCount, courseCount, teacherCount, sessionCount] = await Promise.all([
       User.countDocuments({ role: 'student' }),
       Course.countDocuments({ isActive: { $ne: false } }),
-      User.countDocuments({ role: { $in: ['teacher', 'admin'] } }),
+      User.countDocuments({ role: { $in: ['educator', 'admin'] } }),
       Session.countDocuments({ isActive: true })
     ]);
 

@@ -5,6 +5,8 @@ import Course from '../../../../models/Course';
 import LibraryItem from '../../../../models/LibraryItem';
 import Test from '../../../../models/Test';
 
+export const dynamic = 'force-dynamic';
+
 const BOOTSTRAP_KEY = process.env.MONGODB_BOOTSTRAP_KEY;
 
 export async function POST(request: Request) {

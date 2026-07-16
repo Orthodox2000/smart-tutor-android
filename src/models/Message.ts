@@ -1,29 +1,24 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMessage extends Document {
-  authorId: string;
-  authorName: string;
-  authorRole: string;
-  content: string;
-  type: 'announcement' | 'resource' | 'alert';
-  target: 'all' | 'students' | 'teachers' | 'admins';
-  batchTarget?: string;
-  photoURL?: string;
-  expiresAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  title: string;
+  body: string;
+  channel: string;
+  author?: string;
+  audience: string[];
+  userIds?: string[];
+  createdAt?: string;
+  expiresAt?: string | null;
 }
 
 const MessageSchema: Schema = new Schema({
-  authorId: { type: String, required: true },
-  authorName: { type: String, required: true },
-  authorRole: { type: String, required: true },
-  content: { type: String, required: true },
-  type: { type: String, enum: ['announcement', 'resource', 'alert'], default: 'announcement' },
-  target: { type: String, enum: ['all', 'students', 'teachers', 'admins'], default: 'all' },
-  batchTarget: { type: String },
-  photoURL: { type: String },
-  expiresAt: { type: Date },
+  title: { type: String, required: true },
+  body: { type: String, required: true },
+  channel: { type: String, required: true },
+  author: { type: String },
+  audience: { type: [String], default: ['student', 'educator', 'admin', 'parent'] },
+  userIds: { type: [String] },
+  expiresAt: { type: String },
 }, { timestamps: true });
 
 export default mongoose.models.Message || mongoose.model<IMessage>('Message', MessageSchema);

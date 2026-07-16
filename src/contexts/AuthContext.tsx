@@ -1,21 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// import { 
-//   onAuthStateChanged, 
-//   User as FirebaseUser,
-//   signOut,
-//   signInWithEmailAndPassword,
-//   createUserWithEmailAndPassword,
-//   signInWithPhoneNumber,
-//   RecaptchaVerifier,
-//   ConfirmationResult
-// } from 'firebase/auth';
-// import { collection, doc, getDoc, getDocs, limit, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
-// import { auth, db } from '../lib/firebase';
-import { normalizeMobile, toIndianE164 } from '../lib/phone';
 
-export type UserRole = 'student' | 'teacher' | 'admin';
+export type UserRole = 'student' | 'educator' | 'admin' | 'parent';
 
 export interface UserProfile {
   id: string;
@@ -26,15 +13,16 @@ export interface UserProfile {
   displayName: string;
   photoURL: string;
   role: UserRole;
-  status?: string;
-  program?: string;
   label?: string;
+  status?: 'active' | 'pending' | 'rejected';
+  verified?: boolean;
   permissions?: any[];
   mobile?: string;
   dob?: string;
   educationLevel?: string;
   enrolledCourse?: string;
   batchNumber?: string;
+  program?: string;
   createdAt: string;
 }
 
@@ -42,9 +30,7 @@ interface AuthContextType {
   user: any | null;
   profile: UserProfile | null;
   loading: boolean;
-  signIn: (identifier: string, pass: string) => Promise<void>;
-  requestOtpForMobile: (mobile: string, containerId: string) => Promise<void>;
-  verifyOtpSignIn: (otp: string) => Promise<void>;
+  signIn: (identifier: string, pass: string, role?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -57,11 +43,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch('/api/auth/session', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
-        setProfile(data);
-        setUser({ id: data.id, uid: data.uid, email: data.email });
+        if (data.user) {
+          setProfile(data.user);
+          setUser({ id: data.user.id, uid: data.user.uid, email: data.user.email });
+        } else {
+          setProfile(null);
+          setUser(null);
+        }
       } else {
         setProfile(null);
         setUser(null);
@@ -79,13 +70,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchProfile();
   }, []);
 
-  const signIn = async (identifier: string, pass: string) => {
+  const signIn = async (identifier: string, pass: string, role?: string) => {
     setLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: identifier, password: pass }),
+        credentials: 'include',
+        body: JSON.stringify({ login: identifier, password: pass, role: role || 'student' }),
       });
 
       const data = await res.json();
@@ -102,20 +94,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const requestOtpForMobile = async (mobile: string, containerId: string) => {
-    console.warn('requestOtpForMobile: Custom OTP implementation required');
-    throw new Error('OTP login is not yet implemented in custom auth');
-  };
-
-  const verifyOtpSignIn = async (otp: string) => {
-    console.warn('verifyOtpSignIn: Custom OTP implementation required');
-    throw new Error('OTP verification is not yet implemented in custom auth');
-  };
-
   const logout = async () => {
     setLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       setUser(null);
       setProfile(null);
     } catch (err) {
@@ -126,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, requestOtpForMobile, verifyOtpSignIn, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, logout }}>
       {children}
     </AuthContext.Provider>
   );

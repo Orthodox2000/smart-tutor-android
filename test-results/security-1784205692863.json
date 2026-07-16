@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-07-16T12:41:32.863Z",
+  "passed": 19,
+  "failed": 2,
+  "results": [
+    {
+      "test": "NoSQL injection on login blocked",
+      "status": "FAIL",
+      "detail": "Status: 404",
+      "time": "2026-07-16T12:41:21.693Z"
+    },
+    {
+      "test": "MongoDB operator injection blocked",
+      "status": "PASS",
+      "detail": "Status: 500",
+      "time": "2026-07-16T12:41:22.707Z"
+    },
+    {
+      "test": "Query param injection handled",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:41:22.949Z"
+    },
+    {
+      "test": "XSS in message content handled",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-16T12:41:23.098Z"
+    },
+    {
+      "test": "Unauthenticated session returns 401",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-16T12:41:23.209Z"
+    },
+    {
+      "test": "Invalid session token rejected",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-16T12:41:23.458Z"
+    },
+    {
+      "test": "Generic password rejected",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-16T12:41:24.963Z"
+    },
+    {
+      "test": "Users API does not expose passwords",
+      "status": "PASS",
+      "detail": "Password field properly stripped",
+      "time": "2026-07-16T12:41:25.943Z"
+    },
+    {
+      "test": "Rapid login attempts handled",
+      "status": "PASS",
+      "detail": "All returned < 500",
+      "time": "2026-07-16T12:41:27.275Z"
+    },
+    {
+      "test": "PUT on login returns 405",
+      "status": "PASS",
+      "detail": "Status: 405",
+      "time": "2026-07-16T12:41:27.343Z"
+    },
+    {
+      "test": "PATCH without auth handled",
+      "status": "PASS",
+      "detail": "Status: 405",
+      "time": "2026-07-16T12:41:27.489Z"
+    },
+    {
+      "test": "X-Content-Type-Options header",
+      "status": "PASS",
+      "detail": "Value: nosniff",
+      "time": "2026-07-16T12:41:27.832Z"
+    },
+    {
+      "test": "X-Frame-Options header",
+      "status": "PASS",
+      "detail": "Value: DENY",
+      "time": "2026-07-16T12:41:27.832Z"
+    },
+    {
+      "test": "X-XSS-Protection header",
+      "status": "PASS",
+      "detail": "Value: 1; mode=block",
+      "time": "2026-07-16T12:41:27.832Z"
+    },
+    {
+      "test": "CORS header present",
+      "status": "PASS",
+      "detail": "Value: *",
+      "time": "2026-07-16T12:41:28.468Z"
+    },
+    {
+      "test": "Users list (GET /api/users)",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:41:28.586Z"
+    },
+    {
+      "test": "Logout (POST /api/auth/logout)",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:41:28.738Z"
+    },
+    {
+      "test": "Admin stats (GET /api/admin/stats)",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-16T12:41:28.854Z"
+    },
+    {
+      "test": "Empty username rejected",
+      "status": "PASS",
+      "detail": "Status: 400",
+      "time": "2026-07-16T12:41:31.964Z"
+    },
+    {
+      "test": "Short password rejected",
+      "status": "FAIL",
+      "detail": "Status: 201",
+      "time": "2026-07-16T12:41:32.433Z"
+    },
+    {
+      "test": "Oversized payload handled",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-16T12:41:32.861Z"
+    }
+  ]
+}

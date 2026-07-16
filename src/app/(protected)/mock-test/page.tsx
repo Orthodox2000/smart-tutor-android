@@ -76,7 +76,7 @@ export default function MockTestPage() {
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Testing Arena</p>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tests & Assignments</h1>
         </div>
-        {(profile?.role === 'admin' || profile?.role === 'teacher') && (
+        {(profile?.role === 'admin' || profile?.role === 'educator') && (
            <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
              <Plus size={20} />
            </button>
@@ -95,7 +95,7 @@ export default function MockTestPage() {
                <motion.div 
                  key={test._id}
                  whileHover={{ y: -2 }}
-                 className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex flex-col gap-6 group"
+                 className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-6 group"
                >
                   <div className="flex items-start justify-between">
                      <div className="flex items-center gap-4">
@@ -204,18 +204,18 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
     return (
       <div className="fixed inset-0 z-[200] bg-slate-50 flex justify-center p-4">
         <div className="w-full max-w-[430px] flex flex-col items-center justify-center text-center">
-           <div className="w-24 h-24 bg-slate-200 text-slate-600 rounded-[40px] flex items-center justify-center mb-6">
+           <div className="w-24 h-24 bg-slate-200 text-slate-600 rounded-2xl flex items-center justify-center mb-6">
               <Trophy size={48} />
            </div>
            <h2 className="text-2xl font-black text-slate-900 mb-2">Assessment Complete!</h2>
            <p className="text-slate-500 mb-8 font-medium text-sm">You've successfully completed the {test.title}.</p>
            
            <div className="grid grid-cols-2 gap-4 w-full mb-8">
-              <div className="bg-white p-6 rounded-[32px] border border-slate-100">
+              <div className="bg-white p-6 rounded-2xl border border-slate-100">
                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Your Score</p>
                  <p className="text-3xl font-black text-slate-900">{result.score.toFixed(1)}%</p>
               </div>
-              <div className="bg-white p-6 rounded-[32px] border border-slate-100">
+              <div className="bg-white p-6 rounded-2xl border border-slate-100">
                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Correct</p>
                  <p className="text-3xl font-black text-slate-900">{result.correctAnswers}/{result.totalQuestions}</p>
               </div>
@@ -249,7 +249,7 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
 
           <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
              <div className="space-y-8">
-                <div className="p-8 bg-white rounded-[40px] border border-slate-100 shadow-sm relative overflow-hidden">
+                <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full -mr-4 -mt-4"></div>
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 relative z-10">
                      Question {currentQuestion + 1} of {test.questions.length}
@@ -265,7 +265,7 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
                        key={i}
                        onClick={() => handleSelect(i)}
                        className={`
-                         w-full p-5 rounded-[28px] text-left text-sm font-bold transition-all flex items-center justify-between border-2
+                         w-full p-5 rounded-xl text-left text-sm font-bold transition-all flex items-center justify-between border-2
                          ${answers[currentQuestion] === i 
                            ? 'bg-slate-900 border-slate-900 text-white shadow-md' 
                            : 'bg-white border-white text-slate-500 hover:border-slate-100'}

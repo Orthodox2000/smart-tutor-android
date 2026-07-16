@@ -68,7 +68,7 @@ export default function ContactPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="group block p-5 bg-white border border-slate-100 rounded-[32px] shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
+            className="group block p-5 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98]"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -88,7 +88,7 @@ export default function ContactPage() {
         ))}
       </div>
 
-      <div className="p-8 rounded-[32px] bg-gradient-to-br from-academy-orange-50 to-white border border-academy-orange-100/50 shadow-sm">
+      <div className="p-8 rounded-2xl bg-gradient-to-br from-academy-orange-50 to-white border border-academy-orange-100/50 shadow-sm">
         <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 border border-slate-100">
           <BadgeCheck size={32} className="text-academy-orange-600" />
         </div>
@@ -99,7 +99,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="p-8 rounded-[32px] bg-white border border-slate-100 shadow-sm">
+      <div className="p-8 rounded-2xl bg-white border border-slate-100 shadow-sm">
         <div className="w-16 h-16 bg-academy-orange-50 rounded-2xl flex items-center justify-center mb-4">
           <Building2 size={32} className="text-academy-orange-600" />
         </div>

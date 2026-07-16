@@ -2,8 +2,14 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '../../../lib/mongodb';
 import Test from '../../../models/Test';
 import TestResult from '../../../models/TestResult';
+import { getSessionUser } from '../../../lib/api-helpers';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const session = getSessionUser(request);
+  if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });
+
   try {
     const { testId, studentUid, studentName, answers } = await request.json();
 
@@ -23,8 +29,8 @@ export async function POST(request: Request) {
 
     const result = await TestResult.create({
       testId,
-      studentUid,
-      studentName,
+      studentUid: studentUid || session.uid,
+      studentName: studentName || session.id,
       score,
       totalQuestions: test.questions.length,
       correctAnswers: correctCount,

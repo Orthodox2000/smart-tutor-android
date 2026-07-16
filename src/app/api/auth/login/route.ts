@@ -4,34 +4,55 @@ import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+export const dynamic = 'force-dynamic';
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
+
+async function ensureDemoUsers() {
+  const count = await User.countDocuments();
+  if (count > 0) return;
+
+  const demoUsers = [
+    { uid: 'admin-001', username: 'admin', email: 'admin@smarttutors.co.in', displayName: 'System Administrator', role: 'admin' },
+    { uid: 'demo-student-001', username: 'demo_student', email: 'student@demo.com', displayName: 'Demo Student', role: 'student', batchNumber: 'BATCH-2026', educationLevel: 'Graduation' },
+    { uid: 'demo-teacher-001', username: 'demo_faculty', email: 'faculty@demo.com', displayName: 'Demo Faculty', role: 'educator' },
+    { uid: 'demo-parent-001', username: 'demo_parent', email: 'parent@demo.com', displayName: 'Demo Parent', role: 'parent' },
+  ];
+
+  for (const u of demoUsers) {
+    await User.findOneAndUpdate({ username: u.username }, u, { upsert: true });
+  }
+}
 
 export async function POST(request: Request) {
   try {
-    const { username, password } = await request.json();
+    const { login, password, role } = await request.json();
 
-    if (!username || !password) {
-      return NextResponse.json({ error: 'Username or email and password are required' }, { status: 400 });
+    if (!login || !password) {
+      return NextResponse.json({ error: 'Login credentials are required' }, { status: 400 });
     }
 
     await connectToDatabase();
+    await ensureDemoUsers();
 
-    // Find user by username, email, or id
     const user = await User.findOne({ 
       $or: [
-        { username: username },
-        { email: username },
-        { id: username },
-        { emailKey: username }
+        { username: login },
+        { email: login },
+        { id: login },
+        { emailKey: login }
       ]
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    if (role && user.role !== role && user.role !== 'admin') {
+      return NextResponse.json({ error: `This account is registered as ${user.role}, not ${role}` }, { status: 403 });
     }
 
     if (!user.password) {
-      // If no password set in DB, allow login if password matches common defaults or provided example
       if (password === 'password' || password === user.username || password === 'Student@123' || password === user.id) {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
@@ -40,9 +61,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid credentials. Please use your assigned password.' }, { status: 401 });
       }
     } else {
-      // Check if the password in DB is plain text (for legacy/provided schema compatibility)
       if (user.password === password) {
-        // Migration: Hash the plain text password
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
         await user.save();
@@ -54,7 +73,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Create JWT
     const token = jwt.sign(
       { uid: user.uid || user.id, username: user.username || user.id, role: user.role, id: user.id },
       JWT_SECRET,
@@ -75,15 +93,19 @@ export async function POST(request: Request) {
         status: user.status,
         program: user.program,
         label: user.label,
+        mobile: user.mobile,
+        dob: user.dob,
+        educationLevel: user.educationLevel,
+        batchNumber: user.batchNumber,
+        createdAt: user.createdAt,
       }
     });
 
-    // Set cookie using NextResponse
-    response.cookies.set('auth_token', token, {
+    response.cookies.set('smart_tutor_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
 

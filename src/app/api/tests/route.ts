@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '../../../lib/mongodb';
 import Test from '../../../models/Test';
+import { getSessionUser } from '../../../lib/api-helpers';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
@@ -17,7 +20,7 @@ export async function GET(request: Request) {
     }
 
     const filter: any = { isActive: true };
-    if (category && category !== 'All') {
+    if (category && category !== 'All' && typeof category === 'string' && !category.includes('{') && !category.includes('$')) {
       filter.category = category;
     }
 
@@ -29,6 +32,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = getSessionUser(request);
+  if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });
+  if (session.role !== 'admin' && session.role !== 'educator') {
+    return NextResponse.json({ error: 'Admin or educator only' }, { status: 403 });
+  }
+
   try {
     await connectToDatabase();
     const body = await request.json();

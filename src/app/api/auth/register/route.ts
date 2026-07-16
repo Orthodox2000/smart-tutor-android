@@ -2,86 +2,92 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '../../../../lib/mongodb';
 import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
+
+export const dynamic = 'force-dynamic';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { 
-      username, 
-      password, 
-      email, 
-      displayName, 
-      name,
-      id,
-      role,
-      status,
-      program,
-      label,
-      permissions,
-      mobile, 
-      dob, 
-      educationLevel 
-    } = body;
+    const { username, email, password, displayName, role, mobile, dob, educationLevel, program } = body;
 
-    if (!username || !password || !email) {
-      return NextResponse.json({ error: 'Required fields are missing' }, { status: 400 });
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
+    }
+
+    if (typeof password === 'string' && password.length < 6) {
+      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
     }
 
     await connectToDatabase();
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ 
+    const existing = await User.findOne({ 
       $or: [
-        { username }, 
-        { email },
-        { id: id || username }
-      ] 
+        { username },
+        { email: email || `${username}@smarttutors.co.in` }
+      ]
     });
 
-    if (existingUser) {
-      return NextResponse.json({ error: 'Username, ID or email already in use' }, { status: 400 });
+    if (existing) {
+      return NextResponse.json({ error: 'Username or email already exists' }, { status: 409 });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    const id = `user-${Date.now()}`;
     const newUser = new User({
-      uid: uuidv4(),
-      id: id || username,
+      id,
+      uid: id,
       username,
-      email,
+      email: email || `${username}@smarttutors.co.in`,
       password: hashedPassword,
-      name: name || displayName,
-      displayName: displayName || name,
-      role: role || 'student',
-      status: status || 'active',
-      program,
-      label: label || 'Student Workspace',
-      permissions: permissions || [],
+      displayName: displayName || username,
+      name: displayName || username,
+      role: 'student',
+      status: 'active',
       mobile,
       dob,
       educationLevel,
+      program,
+      label: 'Student Workspace',
+      createdAt: new Date().toISOString(),
     });
 
     await newUser.save();
 
-    return NextResponse.json({
+    const token = jwt.sign(
+      { uid: id, username, role: newUser.role, id },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const response = NextResponse.json({
       success: true,
-      message: 'User registered successfully',
       user: {
         id: newUser.id,
         uid: newUser.uid,
         username: newUser.username,
         email: newUser.email,
-        name: newUser.name,
+        displayName: newUser.displayName,
+        role: newUser.role,
       }
+    }, { status: 201 });
+
+    response.cookies.set('smart_tutor_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
     });
 
+    return response;
+
   } catch (error: any) {
-    console.error('Registration error:', error);
+    console.error('Register error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

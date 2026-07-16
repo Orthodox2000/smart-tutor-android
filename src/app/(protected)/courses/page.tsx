@@ -18,7 +18,7 @@ export default function CoursesPage() {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/courses');
+      const res = await fetch('/api/courses', { credentials: 'include' });
       const data = await res.json();
       setCourses(data);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function CoursesPage() {
           <p className="text-slate-500 text-sm">Pick a course to start your learning journey.</p>
         </div>
         
-        {(profile?.role === 'admin' || profile?.role === 'teacher') && (
+        {(profile?.role === 'admin' || profile?.role === 'educator') && (
           <button 
             className="flex items-center justify-center gap-2 bg-academy-orange-600 text-white px-5 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-academy-orange-100 whitespace-nowrap"
           >
@@ -102,7 +102,7 @@ function CourseCard({ course, index }: { course: any; index: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       onClick={() => setIsExpanded(!isExpanded)}
-      className={`bg-white p-5 rounded-[32px] border border-slate-100 shadow-sm hover:border-slate-200 transition-all cursor-pointer group flex flex-col ${isExpanded ? 'col-span-2' : 'h-full'}`}
+      className={`bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-all cursor-pointer group flex flex-col ${isExpanded ? 'col-span-2' : 'h-full'}`}
     >
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-3">

@@ -175,7 +175,7 @@ export default function UserManagementPage() {
     }
   };
 
-  if (profile?.role !== 'admin' && profile?.role !== 'teacher') {
+  if (profile?.role !== 'admin' && profile?.role !== 'educator') {
     return <div className="p-8 text-center font-bold text-red-500">Access Denied</div>;
   }
 
@@ -208,11 +208,11 @@ export default function UserManagementPage() {
           placeholder="Search by name, ID or roll number..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-12 pr-4 py-4 bg-white border border-slate-100 rounded-[24px] focus:ring-2 focus:ring-academy-orange-600 shadow-sm text-sm font-medium"
+          className="w-full pl-12 pr-4 py-4 bg-white border border-slate-100 rounded-xl focus:ring-2 focus:ring-academy-orange-600 shadow-sm text-sm font-medium"
         />
       </div>
 
-      <div className="bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
+      <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50 border-b border-slate-100">
@@ -265,7 +265,7 @@ export default function UserManagementPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl overflow-hidden overflow-y-auto max-h-[90vh] custom-scrollbar"
+              className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden overflow-y-auto max-h-[90vh] custom-scrollbar"
             >
               <div className="p-10">
                 <header className="flex items-center justify-between mb-8">

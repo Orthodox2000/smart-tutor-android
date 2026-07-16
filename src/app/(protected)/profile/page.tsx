@@ -14,7 +14,8 @@ export default function ProfilePage() {
     { icon: User, label: 'Roll Number / Username', value: profile.username || 'Not assigned' },
     { icon: Mail, label: 'Email Address', value: profile.email },
     { icon: User, label: 'Full Name', value: profile.displayName },
-    { icon: Shield, label: 'Current Role', value: profile.role.toUpperCase() },
+    { icon: Shield, label: 'Current Role', value: profile.role?.toUpperCase() },
+    { icon: User, label: 'Mobile', value: profile.mobile || 'Not provided' },
     { icon: Calendar, label: 'Date of Birth', value: profile.dob || 'Not provided' },
     { icon: User, label: 'Education Level', value: profile.educationLevel || 'Not provided' },
     { icon: Calendar, label: 'Member Since', value: new Date(profile.createdAt).toLocaleDateString() },
@@ -29,10 +30,10 @@ export default function ProfilePage() {
 
       <div className="space-y-6">
         {/* Avatar Card */}
-        <div className="bg-white p-10 rounded-[40px] text-center shadow-sm relative overflow-hidden border border-slate-50">
+        <div className="bg-white p-10 rounded-2xl text-center shadow-sm relative overflow-hidden border border-slate-50">
           <div className="relative z-10">
             <div className="relative inline-block mb-6">
-              <div className="w-32 h-32 rounded-[40px] bg-slate-50 border-[6px] border-white shadow-xl mx-auto flex items-center justify-center">
+              <div className="w-32 h-32 rounded-2xl bg-slate-50 border-[6px] border-white shadow-xl mx-auto flex items-center justify-center">
                 <User size={64} className="text-slate-300" />
               </div>
               <div className="absolute bottom-2 right-2 w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center border-4 border-white shadow-lg">
@@ -47,10 +48,10 @@ export default function ProfilePage() {
         </div>
 
         {/* Info Card */}
-        <div className="bg-white p-6 rounded-[40px] shadow-sm border border-slate-50">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-50">
           <div className="space-y-3">
             {info.map((item) => (
-              <div key={item.label} className="flex items-center gap-4 p-4 bg-slate-50/50 rounded-[24px] border border-slate-50 transition-all">
+              <div key={item.label} className="flex items-center gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-50 transition-all">
                 <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-50">
                   <item.icon size={18} />
                 </div>
@@ -65,7 +66,7 @@ export default function ProfilePage() {
           <div className="mt-8 pt-8 border-t border-slate-50">
             <button 
               onClick={logout}
-              className="w-full bg-slate-900 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] shadow-lg shadow-slate-200 hover:bg-red-600 transition-all flex items-center justify-center gap-2"
+              className="w-full bg-slate-900 text-white py-5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-slate-200 hover:bg-red-600 transition-all flex items-center justify-center gap-2"
             >
               <LogOut size={16} /> Logout Securely
             </button>
@@ -73,7 +74,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Help Banner */}
-        <div className="p-8 rounded-[40px] relative overflow-hidden bg-slate-900 text-white">
+        <div className="p-8 rounded-2xl relative overflow-hidden bg-slate-900 text-white">
           <div className="absolute top-0 right-0 w-40 h-40 bg-academy-orange-600 rounded-full -mr-16 -mt-16 opacity-20 blur-3xl"></div>
           <div className="relative z-10">
             <h3 className="text-lg font-black mb-2 tracking-tight">Academic Support</h3>

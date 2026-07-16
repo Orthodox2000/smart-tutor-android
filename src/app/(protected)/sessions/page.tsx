@@ -67,7 +67,7 @@ export default function SessionsPage() {
            <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Live Learning</p>
            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Active Sessions</h1>
         </div>
-        {(profile?.role === 'admin' || profile?.role === 'teacher') && (
+        {(profile?.role === 'admin' || profile?.role === 'educator') && (
            <button 
              onClick={() => setShowCreate(true)}
              className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
@@ -83,7 +83,7 @@ export default function SessionsPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white p-6 rounded-[32px] border border-academy-orange-100 shadow-sm mb-6"
+            className="bg-white p-6 rounded-2xl border border-academy-orange-100 shadow-sm mb-6"
           >
              <h3 className="font-bold text-slate-800 mb-4">Start New Session</h3>
              <form onSubmit={handleCreateSession} className="space-y-4">
@@ -144,7 +144,7 @@ export default function SessionsPage() {
               key={session._id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm flex flex-col gap-5"
+              className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-5"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">

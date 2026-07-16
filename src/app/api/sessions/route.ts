@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '../../../lib/mongodb';
 import Session from '../../../models/Session';
+import { getSessionUser } from '../../../lib/api-helpers';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
@@ -11,14 +14,17 @@ export async function GET(request: Request) {
     await connectToDatabase();
     
     const filter: any = {};
-    if (role === 'student') {
+    const safeRole = role && typeof role === 'string' && !role.includes('{') && !role.includes('$') ? role : null;
+    const safeBatch = batch && typeof batch === 'string' && !batch.includes('{') && !batch.includes('$') ? batch : null;
+    
+    if (safeRole === 'student') {
       filter.target = { $in: ['all', 'students'] };
-      if (batch) {
+      if (safeBatch) {
         filter.$and = [
-          { $or: [{ batchTarget: { $exists: false } }, { batchTarget: null }, { batchTarget: batch }] }
+          { $or: [{ batchTarget: { $exists: false } }, { batchTarget: null }, { batchTarget: safeBatch }] }
         ];
       }
-    } else if (role === 'teacher') {
+    } else if (safeRole === 'teacher') {
       filter.target = { $in: ['all', 'teachers'] };
     }
 
@@ -30,21 +36,32 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = getSessionUser(request);
+  if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });
+  if (session.role !== 'admin' && session.role !== 'educator') {
+    return NextResponse.json({ error: 'Admin or educator only' }, { status: 403 });
+  }
+
   try {
     await connectToDatabase();
     const body = await request.json();
     
-    // Set default expiry to 24 hours from now if not provided
     const expiresAt = body.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000);
     
-    const session = await Session.create({ ...body, expiresAt });
-    return NextResponse.json(session, { status: 201 });
+    const newSession = await Session.create({ ...body, expiresAt });
+    return NextResponse.json(newSession, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
 
 export async function PATCH(request: Request) {
+  const session = getSessionUser(request);
+  if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });
+  if (session.role !== 'admin' && session.role !== 'educator') {
+    return NextResponse.json({ error: 'Admin or educator only' }, { status: 403 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -52,8 +69,8 @@ export async function PATCH(request: Request) {
 
     await connectToDatabase();
     const body = await request.json();
-    const session = await Session.findByIdAndUpdate(id, body, { new: true });
-    return NextResponse.json(session);
+    const updated = await Session.findByIdAndUpdate(id, body, { new: true });
+    return NextResponse.json(updated);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -8,7 +8,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build && next export"
+    "test:stability": "node scripts/test-stability.cjs",
+    "test:security": "node scripts/test-security.cjs",
+    "test:all": "node scripts/test-stability.cjs && node scripts/test-security.cjs",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "build:apk": "build-apk.bat",
+    "build:playstore": "build-playstore.bat",
+    "keystore": "generate-keystore.bat"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.1",
@@ -16,6 +23,8 @@
     "@capacitor/cli": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "@capacitor/device": "^8.0.2",
+    "@capacitor/geolocation": "^8.2.0",
+    "@capacitor/ios": "^8.3.4",
     "@capacitor/push-notifications": "^8.1.1",
     "@google/genai": "^1.29.0",
     "@types/bcryptjs": "^2.4.6",

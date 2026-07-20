@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Star, MessageSquare, Plus, X, ThumbsUp, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function FeedbackPage() {
   const { profile } = useAuth();
@@ -24,13 +25,9 @@ export default function FeedbackPage() {
   const fetchFeedback = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/student-feedback', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setFeedback(data.feedback || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch feedback:', error);
+      const data = await apiFetch<any>('/student-feedback');
+      setFeedback(data.feedback || []);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -43,18 +40,13 @@ export default function FeedbackPage() {
         ? { type: 'feedback', ...form }
         : { type: 'behaviour', studentId: form.studentId, batchId: form.batchId, rating: form.rating, note: form.note, actionTaken: form.actionTaken, visibleToParent: form.visibleToParent };
 
-      const res = await fetch('/api/student-feedback', {
+      await apiFetch('/student-feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(body),
       });
-      if (res.ok) {
-        setShowCreate(false);
-        fetchFeedback();
-      }
-    } catch (error) {
-      console.error(error);
+      setShowCreate(false);
+      fetchFeedback();
+    } catch {
     }
   };
 

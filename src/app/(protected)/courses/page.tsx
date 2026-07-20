@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, User, DollarSign, Plus, Search, Filter } from 'lucide-react';
 
@@ -18,11 +19,9 @@ export default function CoursesPage() {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/courses', { credentials: 'include' });
-      const data = await res.json();
-      setCourses(data);
-    } catch (error) {
-      console.error('Failed to fetch courses:', error);
+      const data = await apiFetch('/courses');
+      setCourses(Array.isArray(data) ? data : []);
+    } catch {
     } finally {
       setLoading(false);
     }

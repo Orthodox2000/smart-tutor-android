@@ -7,6 +7,7 @@ import {
   Download, ReceiptText, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 type PaymentTransaction = {
   paidAmount: number;
@@ -300,13 +301,9 @@ export default function FeesPage() {
   const fetchInvoices = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/invoices', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setInvoices(data.feeInvoices || data.invoices || []);
-      }
+      const data = await apiFetch<any>('/invoices');
+      setInvoices(data.feeInvoices || data.invoices || []);
     } catch (error) {
-      console.error('Failed to fetch invoices:', error);
     } finally {
       setLoading(false);
     }
@@ -315,22 +312,20 @@ export default function FeesPage() {
   const handleCreateInvoice = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/invoices', {
+      const res = await apiFetch<any>('/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           ...newInvoice,
           amount: parseFloat(newInvoice.amount),
         }),
       });
-      if (res.ok) {
+      if (res) {
         setShowCreate(false);
         setNewInvoice({ title: '', amount: '', dueDate: '', studentId: '', studentName: '', particulars: '' });
         fetchInvoices();
       }
     } catch (error) {
-      console.error(error);
     }
   };
 

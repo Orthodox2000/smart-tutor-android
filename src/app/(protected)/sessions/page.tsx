@@ -8,6 +8,7 @@ import {
   ExternalLink, 
   Link as LinkIcon
 } from 'lucide-react';
+import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function SessionsPage() {
@@ -25,12 +26,9 @@ export default function SessionsPage() {
   const fetchSessions = async () => {
     setLoading(true);
     try {
-      const url = `/api/sessions?role=${profile?.role}&batch=${profile?.batchNumber || ''}`;
-      const res = await fetch(url);
-      const data = await res.json();
+      const data = await apiFetch<any>(`/sessions?role=${profile?.role}&batch=${profile?.batchNumber || ''}`);
       setSessions(data);
     } catch (error) {
-      console.error('Failed to fetch sessions:', error);
     } finally {
       setLoading(false);
     }
@@ -40,7 +38,7 @@ export default function SessionsPage() {
     e.preventDefault();
     if (!profile) return;
     try {
-      const res = await fetch('/api/sessions', {
+      const res = await apiFetch<any>('/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -50,13 +48,12 @@ export default function SessionsPage() {
           isActive: true
         })
       });
-      if (res.ok) {
+      if (res) {
         setShowCreate(false);
         setNewSession({ title: '', meetLink: '', target: 'all', batchTarget: '' });
         fetchSessions();
       }
     } catch (error) {
-      console.error(error);
     }
   };
 

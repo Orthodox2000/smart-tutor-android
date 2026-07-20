@@ -9,6 +9,7 @@ import {
   X, Loader2, Phone, Calendar, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function SettingsPage() {
   const { i18n } = useTranslation();
@@ -137,10 +138,9 @@ function EditableProfile() {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/users/profile', {
+      const data = await apiFetch<any>('/users/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           uid: profile.uid || undefined,
           id: profile.id,
@@ -150,13 +150,12 @@ function EditableProfile() {
         }),
       });
 
-      if (res.ok) {
+      if (data) {
         setEditing(false);
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
         window.location.reload();
       } else {
-        const data = await res.json();
         setError(data.error || t('profile.saveError'));
       }
     } catch {

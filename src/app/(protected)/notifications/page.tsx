@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bell, Megaphone, ShieldAlert, MessageSquare, Check, Trash2 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 import Link from 'next/link';
 
 export default function NotificationsPage() {
@@ -19,13 +20,9 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/notifications', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setNotifications(data.notifications || []);
-      }
+      const data = await apiFetch<any>('/notifications');
+      setNotifications(data.notifications || []);
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -33,24 +30,21 @@ export default function NotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      await fetch('/api/notifications', {
+      await apiFetch('/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ id }),
       });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     } catch (error) {
-      console.error(error);
     }
   };
 
   const deleteNotification = async (id: string) => {
     try {
-      await fetch(`/api/notifications?id=${id}`, { method: 'DELETE', credentials: 'include' });
+      await apiFetch(`/notifications?id=${id}`, { method: 'DELETE' });
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (error) {
-      console.error(error);
     }
   };
 

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Maximize2, Sparkles, Phone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { apiFetch } from '../lib/api';
 
 export default function SmartTutorsAIChatbot({ open, onOpenChange }: { open?: boolean; onOpenChange?: (v: boolean) => void }) {
   const { profile } = useAuth();
@@ -35,9 +36,8 @@ export default function SmartTutorsAIChatbot({ open, onOpenChange }: { open?: bo
     setLoading(true);
 
     try {
-      const res = await fetch('/api/smarttutors-chat', {
+      const data = await apiFetch<{ reply?: string }>('/smarttutors-chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
           memory: {
@@ -55,14 +55,12 @@ export default function SmartTutorsAIChatbot({ open, onOpenChange }: { open?: bo
         })
       });
 
-      const data = await res.json();
       if (data.reply) {
-        setMessages(prev => [...prev, { role: 'model', text: data.reply }]);
+        setMessages(prev => [...prev, { role: 'model', text: data.reply! }]);
       } else {
         setMessages(prev => [...prev, { role: 'model', text: 'Sorry, I encountered an error. Please try again.' }]);
       }
-    } catch (error) {
-      console.error('Chat error:', error);
+    } catch {
       setMessages(prev => [...prev, { role: 'model', text: 'Connection lost. Please check your internet.' }]);
     } finally {
       setLoading(false);

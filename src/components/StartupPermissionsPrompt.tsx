@@ -10,7 +10,7 @@ import {
   safeWriteStorage,
   supportsNotifications,
 } from '../lib/browser';
-import { isCapacitor, registerForPushNotifications, requestLocationPermission } from '../lib/capacitor';
+import { isCapacitor, requestLocationPermission } from '../lib/capacitor';
 
 const DISMISS_KEY = 'startup-permissions-dismissed';
 const LOCATION_KEY = 'startup-location-dismissed';
@@ -23,7 +23,6 @@ export default function StartupPermissionsPrompt() {
 
   React.useEffect(() => {
     if (isCapacitor()) {
-      registerForPushNotifications();
       setTimeout(() => {
         const locDismissed = safeReadStorage(LOCATION_KEY) === 'true';
         if (!locDismissed) setLocationVisible(true);

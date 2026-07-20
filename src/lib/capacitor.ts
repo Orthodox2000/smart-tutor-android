@@ -19,15 +19,7 @@ export async function requestNativeNotificationPermission(): Promise<string> {
     }
     return 'unsupported';
   }
-
-  try {
-    const { PushNotifications } = await import('@capacitor/push-notifications');
-    const result = await PushNotifications.requestPermissions();
-    return result.receive === 'granted' ? 'granted' : 'denied';
-  } catch (error) {
-    console.warn('Native notification permission request failed:', error);
-    return 'denied';
-  }
+  return 'unsupported';
 }
 
 export async function requestLocationPermission(): Promise<string> {
@@ -53,38 +45,6 @@ export async function requestLocationPermission(): Promise<string> {
     const result = await Geolocation.requestPermissions();
     return result.location === 'granted' ? 'granted' : 'denied';
   } catch (error) {
-    console.warn('Native location permission request failed:', error);
     return 'denied';
-  }
-}
-
-export async function registerForPushNotifications(): Promise<void> {
-  if (!isCapacitor()) return;
-
-  try {
-    const { PushNotifications } = await import('@capacitor/push-notifications');
-    
-    const permResult = await PushNotifications.requestPermissions();
-    if (permResult.receive !== 'granted') return;
-
-    await PushNotifications.register();
-
-    PushNotifications.addListener('registration', (token) => {
-      console.info('Push registration success:', token.value);
-    });
-
-    PushNotifications.addListener('registrationError', (error) => {
-      console.error('Push registration error:', error);
-    });
-
-    PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      console.info('Push received:', notification);
-    });
-
-    PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-      console.info('Push action performed:', action);
-    });
-  } catch (error) {
-    console.warn('Push notification setup failed:', error);
   }
 }

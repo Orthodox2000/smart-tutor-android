@@ -36,6 +36,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import SmartTutorsAIChatbot from './SmartTutorsAIChatbot';
+import { apiFetch } from '../lib/api';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
@@ -76,11 +77,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     const fetchNotifications = async () => {
       try {
-        const res = await fetch('/api/notifications', { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          setNotifications(data.notifications || data || []);
-        }
+        const data = await apiFetch<any>('/notifications');
+        setNotifications(data.notifications || data || []);
       } catch {
         setNotifications([]);
       }
@@ -117,7 +115,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         
         <header className="h-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 sticky top-0 z-30 px-4 flex items-center justify-between pt-[env(safe-area-inset-top)]">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/image1.png" alt="Smart Tutors" className="h-9 w-auto object-contain brightness-0 invert" />
+            <img src="/image4.jpeg" alt="Smart Tutors" className="h-9 w-9 rounded-lg object-cover" />
           </Link>
 
           <div className="flex items-center gap-2">

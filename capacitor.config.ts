@@ -1,14 +1,13 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.ankit.smarttutor',
+  appId: 'com.ankit.smarttutors',
   appName: 'Smart Tutors',
-  webDir: 'dist',
-  server: {
-    url: 'https://smart-tutor-android.vercel.app/',
-    cleartext: true
-  },
+  webDir: 'out',
   plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 2000,

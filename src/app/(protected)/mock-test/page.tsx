@@ -1,14 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'motion/react';
 import { 
-  PenTool, 
   Clock, 
-  CheckCircle, 
   ArrowRight, 
-  Timer,
-  AlertCircle,
   Trophy,
   ChevronLeft,
   ChevronRight,
@@ -17,33 +13,35 @@ import {
   FileText,
   User,
   Plus,
-  Download
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function MockTestPage() {
   const { profile } = useAuth();
   const [tests, setTests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeTestId, setActiveTestId] = useState<string | null>(null);
   const [fullTestData, setFullTestData] = useState<any>(null);
+  const [testError, setTestError] = useState('');
 
-  useEffect(() => {
-    fetchTests();
-  }, []);
-
-  const fetchTests = async () => {
+  const fetchTests = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
-      const res = await fetch('/api/tests');
-      const data = await res.json();
-      setTests(data);
-    } catch (error) {
-      console.error('Failed to fetch tests:', error);
+      const data = await apiFetch<any>('/tests');
+      setTests(Array.isArray(data) ? data : (data.tests ?? []));
+    } catch {
+      setError('Unable to load assessments. Pull to retry.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => { fetchTests(); }, [fetchTests]);
 
   const startTest = async (testId: string) => {
     const test = tests.find(t => t._id === testId);
@@ -51,37 +49,56 @@ export default function MockTestPage() {
       window.open(test.fileUrl, '_blank');
       return;
     }
-    
     setLoading(true);
+    setTestError('');
     try {
-      const res = await fetch(`/api/tests?id=${testId}`);
-      const data = await res.json();
-      setFullTestData(data);
+      const data = await apiFetch<any>(`/tests?id=${testId}`);
+      const questions = data?.questions ?? data?.test?.questions ?? [];
+      if (!Array.isArray(questions) || questions.length === 0) {
+        setTestError('This test has no questions yet.');
+        return;
+      }
+      setFullTestData({ ...data, questions });
       setActiveTestId(testId);
-    } catch (error) {
-      console.error('Failed to start test:', error);
+    } catch {
+      setTestError('Failed to load test questions.');
     } finally {
       setLoading(false);
     }
   };
 
+  const exitTest = () => { setActiveTestId(null); setFullTestData(null); setTestError(''); };
+
   if (activeTestId && fullTestData) {
-    return <TestSession test={fullTestData} onExit={() => { setActiveTestId(null); setFullTestData(null); }} />;
+    return <TestSession test={fullTestData} onExit={exitTest} />;
   }
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-8 pb-20 animate-fade-in">
       <header className="flex items-center justify-between">
         <div>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Testing Arena</p>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tests & Assignments</h1>
         </div>
-        {(profile?.role === 'admin' || profile?.role === 'educator') && (
-           <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
-             <Plus size={20} />
-           </button>
-        )}
+        <div className="flex items-center gap-2">
+          <button onClick={fetchTests} className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center">
+            <RefreshCw size={18} />
+          </button>
+          {(profile?.role === 'admin' || profile?.role === 'educator') && (
+            <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
+              <Plus size={20} />
+            </button>
+          )}
+        </div>
       </header>
+
+      {testError && (
+        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3">
+          <AlertCircle size={18} className="text-red-500 shrink-0" />
+          <p className="text-xs font-bold text-red-600">{testError}</p>
+          <button onClick={exitTest} className="ml-auto text-xs font-bold text-red-600 underline">Dismiss</button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {loading ? (
@@ -89,11 +106,17 @@ export default function MockTestPage() {
             <Loader2 className="animate-spin mb-4" size={32} />
             <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Loading Assessments...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
+            <AlertCircle className="mx-auto text-slate-300 mb-4" size={48} />
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">{error}</p>
+            <button onClick={fetchTests} className="px-6 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold">Retry</button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
              {tests.map((test) => (
                <motion.div 
-                 key={test._id}
+                 key={test._id ?? test.id}
                  whileHover={{ y: -2 }}
                  className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-6 group"
                >
@@ -105,10 +128,10 @@ export default function MockTestPage() {
                         <div>
                            <div className="flex items-center gap-2 mb-1">
                               <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600">
-                                {test.category}
+                                {test.category ?? 'General'}
                               </span>
                               <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md bg-slate-50 text-slate-400">
-                                {test.subject}
+                                {test.subject ?? 'All'}
                               </span>
                            </div>
                            <h4 className="font-bold text-slate-800 leading-tight">{test.title}</h4>
@@ -123,7 +146,7 @@ export default function MockTestPage() {
                         </div>
                         <div>
                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">Sent By</p>
-                           <p className="text-[10px] font-bold text-slate-700">{test.senderName} ({test.senderRole})</p>
+                           <p className="text-[10px] font-bold text-slate-700">{test.senderName ?? 'Academy'} ({test.senderRole ?? 'Admin'})</p>
                         </div>
                      </div>
                      <button 
@@ -151,37 +174,33 @@ export default function MockTestPage() {
 
 function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
   const { profile } = useAuth();
+  const questions: any[] = test?.questions ?? [];
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>(new Array(test.questions.length).fill(-1));
+  const [answers, setAnswers] = useState<number[]>(() => new Array(questions.length).fill(-1));
   const [timeLeft, setTimeLeft] = useState((test.duration || 60) * 60);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      handleSubmit();
-      return;
-    }
-    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    if (timeLeft <= 0) { handleSubmit(); return; }
+    const timer = setInterval(() => setTimeLeft(p => p - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   const handleSelect = (optionIndex: number) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestion] = optionIndex;
-    setAnswers(newAnswers);
+    setAnswers(prev => { const n = [...prev]; n[currentQuestion] = optionIndex; return n; });
   };
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch('/api/mock-test', {
+      const data = await apiFetch<any>('/mock-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -191,14 +210,26 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
           answers
         })
       });
-      const data = await res.json();
       setResult(data);
-    } catch (error) {
-      console.error('Failed to submit test:', error);
+    } catch {
+      setResult(null);
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (questions.length === 0) {
+    return (
+      <div className="fixed inset-0 z-[200] bg-white flex items-center justify-center p-8">
+        <div className="text-center max-w-xs">
+          <AlertCircle size={40} className="mx-auto text-slate-300 mb-4" />
+          <h3 className="font-bold text-slate-800 mb-2">Test Unavailable</h3>
+          <p className="text-sm text-slate-500 mb-6">This test has no questions or failed to load.</p>
+          <button onClick={onExit} className="px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold">Go Back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (result) {
     return (
@@ -208,23 +239,20 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
               <Trophy size={48} />
            </div>
            <h2 className="text-2xl font-black text-slate-900 mb-2">Assessment Complete!</h2>
-           <p className="text-slate-500 mb-8 font-medium text-sm">You've successfully completed the {test.title}.</p>
+           <p className="text-slate-500 mb-8 font-medium text-sm">You've completed {test.title}.</p>
            
            <div className="grid grid-cols-2 gap-4 w-full mb-8">
               <div className="bg-white p-6 rounded-2xl border border-slate-100">
-                 <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Your Score</p>
-                 <p className="text-3xl font-black text-slate-900">{result.score.toFixed(1)}%</p>
+                 <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Score</p>
+                 <p className="text-3xl font-black text-slate-900">{result.score?.toFixed(1) ?? '—'}%</p>
               </div>
               <div className="bg-white p-6 rounded-2xl border border-slate-100">
                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Correct</p>
-                 <p className="text-3xl font-black text-slate-900">{result.correctAnswers}/{result.totalQuestions}</p>
+                 <p className="text-3xl font-black text-slate-900">{result.correctAnswers ?? 0}/{result.totalQuestions ?? questions.length}</p>
               </div>
            </div>
 
-           <button 
-             onClick={onExit}
-             className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-200"
-           >
+           <button onClick={onExit} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-200">
              Return to Assessments
            </button>
         </div>
@@ -232,7 +260,7 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
     );
   }
 
-  const q = test.questions[currentQuestion];
+  const q = questions[currentQuestion];
 
   return (
     <div className="fixed inset-0 z-[200] bg-white flex justify-center">
@@ -240,7 +268,7 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
           <header className="p-6 bg-white border-b border-slate-100 flex items-center justify-between sticky top-0 z-10">
              <div>
                 <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{test.title}</h3>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">In Progress • {test.subject}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">In Progress • {test.subject ?? 'Test'}</p>
              </div>
              <div className={`flex items-center gap-2 px-3 py-2 rounded-xl font-mono text-xs font-black ${timeLeft < 300 ? 'bg-red-50 text-red-600' : 'bg-slate-900 text-white'}`}>
                 <Clock size={14} /> {formatTime(timeLeft)}
@@ -252,15 +280,15 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
                 <div className="p-8 bg-white rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full -mr-4 -mt-4"></div>
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 relative z-10">
-                     Question {currentQuestion + 1} of {test.questions.length}
+                     Question {currentQuestion + 1} of {questions.length}
                    </p>
                    <p className="text-[15px] font-bold text-slate-800 leading-relaxed relative z-10">
-                     {q.question}
+                     {q?.question ?? 'Question not available'}
                    </p>
                 </div>
 
                 <div className="space-y-3">
-                   {q.options.map((opt: string, i: number) => (
+                   {(q?.options ?? []).map((opt: string, i: number) => (
                      <button 
                        key={i}
                        onClick={() => handleSelect(i)}
@@ -284,21 +312,24 @@ function TestSession({ test, onExit }: { test: any, onExit: () => void }) {
                         }`} />
                      </button>
                    ))}
+                   {(q?.options ?? []).length === 0 && (
+                     <p className="text-xs text-slate-400 text-center py-8">No options available for this question.</p>
+                   )}
                 </div>
              </div>
           </div>
 
           <footer className="p-6 bg-white border-t border-slate-100 flex gap-3 sticky bottom-0">
              <button 
-               onClick={() => currentQuestion > 0 ? setCurrentQuestion(prev => prev - 1) : onExit()} 
+               onClick={() => currentQuestion > 0 ? setCurrentQuestion(p => p - 1) : onExit()} 
                className="px-6 py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold text-sm"
              >
                 {currentQuestion === 0 ? 'Quit' : <ChevronLeft size={20} />}
              </button>
              
-             {currentQuestion < test.questions.length - 1 ? (
+             {currentQuestion < questions.length - 1 ? (
                 <button 
-                  onClick={() => setCurrentQuestion(prev => prev + 1)}
+                  onClick={() => setCurrentQuestion(p => p + 1)}
                   disabled={answers[currentQuestion] === -1}
                   className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm shadow-lg shadow-slate-200 disabled:opacity-50 flex items-center justify-center gap-2"
                 >

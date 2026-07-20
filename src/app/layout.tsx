@@ -7,6 +7,26 @@ export const metadata: Metadata = {
   title: 'Smart Tutors',
   description: 'Smart Tutors - Educational platform for excellence.',
   manifest: '/site.webmanifest',
+  openGraph: {
+    title: 'Smart Tutors',
+    description: 'Smart Tutors - Educational platform for excellence.',
+    images: [
+      {
+        url: 'https://smarttutors.co.in/image4.jpeg',
+        width: 1200,
+        height: 630,
+        alt: 'Smart Tutors',
+      },
+    ],
+    type: 'website',
+    siteName: 'Smart Tutors',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Smart Tutors',
+    description: 'Smart Tutors - Educational platform for excellence.',
+    images: ['https://smarttutors.co.in/image4.jpeg'],
+  },
 };
 
 export const viewport: Viewport = {

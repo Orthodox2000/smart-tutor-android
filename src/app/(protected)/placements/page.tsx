@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Briefcase, MapPin, IndianRupee, ExternalLink, Plus, X } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function PlacementsPage() {
   const { profile } = useAuth();
@@ -19,13 +20,9 @@ export default function PlacementsPage() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/placement-jobs', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setJobs(data.jobs || data || []);
-      }
+      const data = await apiFetch<any>('/placement-jobs');
+      setJobs(data.jobs || data || []);
     } catch (error) {
-      console.error('Failed to fetch placement jobs:', error);
     } finally {
       setLoading(false);
     }
@@ -34,19 +31,17 @@ export default function PlacementsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/placement-jobs', {
+      const res = await apiFetch<any>('/placement-jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(form),
       });
-      if (res.ok) {
+      if (res) {
         setShowCreate(false);
         setForm({ title: '', company: '', location: '', salary: '', description: '', requirements: '', applyLink: '' });
         fetchJobs();
       }
     } catch (error) {
-      console.error(error);
     }
   };
 

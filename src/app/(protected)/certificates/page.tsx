@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Award, Download, Plus, X, Trash2 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 const TEMPLATES = [
   { id: 'classic-gold', name: 'Classic Gold', color: 'from-amber-100 to-yellow-50', border: 'border-amber-300' },
@@ -34,13 +35,9 @@ export default function CertificatesPage() {
   const fetchCertificates = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/certificates', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setCertificates(data.certificates || data || []);
-      }
+      const data = await apiFetch<any>('/certificates');
+      setCertificates(data.certificates || data || []);
     } catch (error) {
-      console.error('Failed to fetch certificates:', error);
     } finally {
       setLoading(false);
     }
@@ -49,37 +46,33 @@ export default function CertificatesPage() {
   const handleIssue = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/certificates', {
+      const res = await apiFetch<any>('/certificates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           ...form,
           issuedBy: profile?.id,
           issuedByName: profile?.displayName || profile?.username,
         }),
       });
-      if (res.ok) {
+      if (res) {
         setShowIssue(false);
         fetchCertificates();
       }
     } catch (error) {
-      console.error(error);
     }
   };
 
   const handleRevoke = async (id: string) => {
     if (!confirm('Revoke this certificate?')) return;
     try {
-      await fetch(`/api/certificates/${id}`, {
+      await apiFetch(`/certificates/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ status: 'revoked', revokeReason: 'Revoked by admin' }),
       });
       fetchCertificates();
     } catch (error) {
-      console.error(error);
     }
   };
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trophy, Clock, CheckCircle, ArrowRight, Sparkles, Send } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
 const SUBJECTS = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Geography', 'Computer Science'];
@@ -22,14 +23,12 @@ export default function QuizArenaPage() {
   const startQuiz = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/quiz-arena/generate', {
+      const data = await apiFetch<any>('/quiz-arena/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(config),
       });
-      if (res.ok) {
-        const data = await res.json();
+      if (data) {
         setQuestions(data.questions || []);
         setAnswers(new Array((data.questions || []).length).fill(-1));
         setCurrentQ(0);
@@ -37,7 +36,6 @@ export default function QuizArenaPage() {
         setStep('quiz');
       }
     } catch (error) {
-      console.error('Failed to generate quiz:', error);
     } finally {
       setLoading(false);
     }

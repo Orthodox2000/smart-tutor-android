@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { BarChart3, TrendingUp, FileText } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function PerformancePage() {
   const { profile } = useAuth();
@@ -18,15 +19,11 @@ export default function PerformancePage() {
     setLoading(true);
     try {
       const endpoint = profile?.role === 'student' || profile?.role === 'parent'
-        ? '/api/student-performance/reports/mine'
-        : '/api/student-performance/reports';
-      const res = await fetch(endpoint, { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setReports(data.reports || data || []);
-      }
+        ? '/student-performance/reports/mine'
+        : '/student-performance/reports';
+      const data = await apiFetch<any>(endpoint);
+      setReports(data.reports || data || []);
     } catch (error) {
-      console.error('Failed to fetch reports:', error);
     } finally {
       setLoading(false);
     }

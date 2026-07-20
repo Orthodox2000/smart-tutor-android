@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { FileCheck, Calendar, Award, Plus, X } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function WeeklyTestsPage() {
   const { profile } = useAuth();
@@ -19,13 +20,9 @@ export default function WeeklyTestsPage() {
   const fetchTests = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/weekly-tests', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setTests(data.weeklyTests || data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch weekly tests:', error);
+      const data = await apiFetch<any>('/weekly-tests');
+      setTests(data.weeklyTests || data || []);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -34,19 +31,14 @@ export default function WeeklyTestsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/weekly-tests', {
+      await apiFetch('/weekly-tests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ ...form, totalMarks: parseInt(form.totalMarks), results: [] }),
       });
-      if (res.ok) {
-        setShowCreate(false);
-        setForm({ title: '', batchId: '', subject: '', testDate: '', totalMarks: '' });
-        fetchTests();
-      }
-    } catch (error) {
-      console.error(error);
+      setShowCreate(false);
+      setForm({ title: '', batchId: '', subject: '', testDate: '', totalMarks: '' });
+      fetchTests();
+    } catch {
     }
   };
 

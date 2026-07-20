@@ -13,3 +13,4 @@ android
 public/
 firebase-blueprint.json 
 /firebase.rules
+backup/

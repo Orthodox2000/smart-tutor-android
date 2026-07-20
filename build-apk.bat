@@ -5,7 +5,15 @@ echo   SMART TUTORS — Capacitor APK Builder
 echo ═══════════════════════════════════════════
 echo.
 
-echo [1/6] Installing dependencies...
+echo [1/7] Cleaning previous build artifacts...
+if exist ".next" rmdir /s /q ".next"
+if exist "out" rmdir /s /q "out"
+if exist "android\app\build" rmdir /s /q "android\app\build"
+if exist "android\app\src\main\assets\public" rmdir /s /q "android\app\src\main\assets\public"
+echo Clean complete.
+
+echo.
+echo [2/7] Installing dependencies...
 call npm install
 if %errorlevel% neq 0 (
     echo ERROR: npm install failed
@@ -13,12 +21,12 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [2/6] Running TypeScript check...
+echo [3/7] Running TypeScript check...
 call npx tsc --noEmit 2>nul
 echo TypeScript check complete.
 
 echo.
-echo [3/6] Building Next.js for production...
+echo [4/7] Building Next.js for production (static export)...
 call npx next build
 if %errorlevel% neq 0 (
     echo ERROR: Next.js build failed
@@ -26,7 +34,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [4/6] Syncing web assets to Android...
+echo [5/7] Syncing web assets to Android...
 call npx cap sync android
 if %errorlevel% neq 0 (
     echo ERROR: Capacitor sync failed
@@ -34,8 +42,9 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [5/6] Building Android APK (debug)...
+echo [6/7] Building Android APK (debug)...
 cd android
+call gradlew.bat clean
 call gradlew.bat assembleDebug
 if %errorlevel% neq 0 (
     echo ERROR: Gradle build failed
@@ -45,7 +54,7 @@ if %errorlevel% neq 0 (
 cd ..
 
 echo.
-echo [6/6] Copying APK to output folder...
+echo [7/7] Copying APK to output folder...
 if not exist "output" mkdir output
 copy "android\app\build\outputs\apk\debug\app-debug.apk" "output\SmartTutors-debug.apk"
 

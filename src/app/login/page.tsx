@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { User, Lock, ChevronRight, GraduationCap, Users, BookOpen } from 'lucide-react';
+import { User, Lock, ChevronRight, GraduationCap, Users, BookOpen, Eye, EyeOff } from 'lucide-react';
 
 const LOGIN_ROLES = [
   { key: 'student', label: 'Student', icon: GraduationCap },
@@ -17,8 +17,8 @@ const getFriendlyErrorMessage = (error: any) => {
   if (msg.includes('not found')) return 'No account found with these credentials.';
   if (msg.includes('Invalid credentials')) return 'Incorrect password. Please try again.';
   if (msg.includes('registered as')) return msg;
-  if (msg.includes('network') || msg.includes('fetch')) return 'Network error. Please check your internet.';
-  return msg || 'An unexpected error occurred. Please try again.';
+  if (msg.includes('network') || msg.includes('fetch') || msg.includes('Network')) return 'Network error. Please check your internet connection.';
+  return msg || 'Something went wrong. Please try again.';
 };
 
 export default function LoginPage() {
@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading && profile) {
@@ -58,8 +59,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center bg-slate-200 min-h-screen">
-      <div className="w-full max-w-[430px] bg-white min-h-screen relative overflow-hidden shadow-2xl flex flex-col items-center p-8">
+    <div className="flex items-center justify-center bg-slate-200 min-h-screen">
+      <div className="w-full max-w-[430px] bg-white min-h-screen sm:min-h-0 sm:h-[85vh] sm:max-h-[780px] relative overflow-hidden shadow-2xl flex flex-col items-center justify-center sm:rounded-3xl p-8">
         
         <div className="absolute top-0 right-0 w-64 h-64 bg-academy-orange-50 rounded-full blur-3xl -mr-32 -mt-16 opacity-60"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-academy-red-50 rounded-full blur-3xl -ml-32 -mb-16 opacity-60"></div>
@@ -70,10 +71,15 @@ export default function LoginPage() {
             animate={{ scale: 1, opacity: 1 }}
             className="mb-6"
           >
-            <img src="/image1.png" alt="Smart Tutors" className="h-20 w-auto object-contain" />
+            <img 
+              src="/image4.jpeg" 
+              alt="Smart Tutors" 
+              className="h-20 w-20 rounded-2xl object-cover shadow-lg" 
+            />
           </motion.div>
 
-          <div className="mb-8" />
+          <h1 className="text-lg font-black text-slate-900 tracking-tight mb-1">Smart Tutors</h1>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Welcome back</p>
 
           {/* Role Selector */}
           <div className="mb-6 flex w-full rounded-2xl bg-slate-100 p-1">
@@ -124,13 +130,20 @@ export default function LoginPage() {
               <div className="relative w-full">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-academy-orange-600 rounded-2xl transition-all text-sm font-medium placeholder:text-slate-400"
+                  className="w-full pl-12 pr-12 py-4 bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-academy-orange-600 rounded-2xl transition-all text-sm font-medium placeholder:text-slate-400"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
@@ -152,7 +165,7 @@ export default function LoginPage() {
             </a>
           </div>
           
-          <div className="mt-auto pt-10 text-center">
+          <div className="mt-6 text-center">
              <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
                Smart Tutors &bull; v3.0
              </p>

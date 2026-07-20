@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Video, Plus, X, ExternalLink, Clock } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function LecturesPage() {
   const { profile } = useAuth();
@@ -19,13 +20,9 @@ export default function LecturesPage() {
   const fetchLectures = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/lectures', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setLectures(data.lectures || data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch lectures:', error);
+      const data = await apiFetch<any>('/lectures');
+      setLectures(data.lectures || data || []);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -34,23 +31,18 @@ export default function LecturesPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/lectures', {
+      await apiFetch('/lectures', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           ...form,
           teacherId: profile?.id,
           teacherName: profile?.displayName || profile?.username,
         }),
       });
-      if (res.ok) {
-        setShowCreate(false);
-        setForm({ title: '', subject: '', timing: '', meetingLink: '', target: 'all' });
-        fetchLectures();
-      }
-    } catch (error) {
-      console.error(error);
+      setShowCreate(false);
+      setForm({ title: '', subject: '', timing: '', meetingLink: '', target: 'all' });
+      fetchLectures();
+    } catch {
     }
   };
 

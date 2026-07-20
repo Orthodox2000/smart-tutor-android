@@ -21,6 +21,7 @@ import {
   Folder
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: Library },
@@ -54,11 +55,9 @@ export default function DigitalLibraryPage() {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/digital-library', { credentials: 'include' });
-      const data = await res.json();
+      const data = await apiFetch<any>('/digital-library');
       setItems(Array.isArray(data) ? data : data.items || []);
-    } catch (error) {
-      console.error('Failed to fetch library items:', error);
+    } catch {
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, 
@@ -47,22 +48,18 @@ export default function UserManagementPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('/api/users');
-      const data = await res.json();
+      const data = await apiFetch<any>('/users');
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
       setUsers([]);
     }
   };
 
   const fetchCourses = async () => {
     try {
-      const res = await fetch('/api/courses');
-      const data = await res.json();
+      const data = await apiFetch<any>('/courses');
       setCourses(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
       setCourses([]);
     }
   };
@@ -104,16 +101,15 @@ export default function UserManagementPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/register', {
+      const data = await apiFetch<any>('/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          displayName: formData.name // Compatibility
+          displayName: formData.name
         })
       });
-      const data = await res.json();
-      if (res.ok) {
+      if (data) {
         setIsAddModalOpen(false);
         fetchUsers();
       } else {
@@ -131,20 +127,19 @@ export default function UserManagementPage() {
     setLoading(true);
     try {
       // Use profile API or a dedicated update API
-      const res = await fetch('/api/users/profile', {
+      const data = await apiFetch<any>('/users/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           uid: selectedUser.uid,
-          displayName: formData.name // Compatibility
+          displayName: formData.name
         })
       });
-      if (res.ok) {
+      if (data) {
         setIsEditModalOpen(false);
         fetchUsers();
       } else {
-        const data = await res.json();
         setError(data.error || 'Failed to update user');
       }
     } catch (err: any) {
@@ -159,14 +154,13 @@ export default function UserManagementPage() {
     
     setLoading(true);
     try {
-      const res = await fetch(`/api/users?id=${userId}`, {
+      const res = await apiFetch<any>(`/users?id=${userId}`, {
         method: 'DELETE'
       });
-      if (res.ok) {
+      if (res) {
         fetchUsers();
       } else {
-        const data = await res.json();
-        alert(data.error || 'Failed to delete user');
+        alert('Failed to delete user');
       }
     } catch (err: any) {
       alert(err.message);

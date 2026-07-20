@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, MessageSquare, Megaphone, Trash2, ShieldAlert, Clock, X } from 'lucide-react';
 
@@ -25,13 +26,9 @@ export default function MessagesPage() {
   const fetchMessages = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/messages', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data.messages || []);
-      }
+      const data = await apiFetch<any>('/messages');
+      setMessages(data.messages || []);
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
     } finally {
       setLoading(false);
     }
@@ -46,10 +43,9 @@ export default function MessagesPage() {
         ? null
         : new Date(Date.now() + parseInt(expiryHours) * 60 * 60 * 1000).toISOString();
 
-      const res = await fetch('/api/messages', {
+      const res = await apiFetch<any>('/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           title: newTitle,
           body: newBody,
@@ -60,23 +56,21 @@ export default function MessagesPage() {
         })
       });
 
-      if (res.ok) {
+      if (res) {
         setNewTitle('');
         setNewBody('');
         fetchMessages();
       }
     } catch (error) {
-      console.error(error);
     }
   };
 
   const handleDeleteMessage = async (msgId: string) => {
     if (!window.confirm('Delete this message?')) return;
     try {
-      await fetch(`/api/messages?id=${msgId}`, { method: 'DELETE', credentials: 'include' });
+      await apiFetch(`/messages?id=${msgId}`, { method: 'DELETE' });
       fetchMessages();
     } catch (error) {
-      console.error(error);
     }
   };
 

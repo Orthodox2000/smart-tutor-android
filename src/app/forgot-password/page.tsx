@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { ArrowLeft, Send, CheckCircle, User, Mail, Phone, Key } from 'lucide-react';
+import { apiFetch } from '../../lib/api';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -23,13 +24,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/auth/forgot-password', {
+      await apiFetch('/auth/forgot-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit request');
       setSubmitted(true);
     } catch (err: any) {
       setError(err.message || 'Something went wrong');

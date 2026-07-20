@@ -47,6 +47,7 @@
     "node_modules",
     "android",
     "dist",
-    "backup"
+    "backup",
+    "server"
   ]
 }

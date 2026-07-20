@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiFetch } from '../../lib/api';
 import { motion } from 'motion/react';
 import { 
   Users, BookOpen, Video, ExternalLink, ChevronRight,
@@ -115,20 +116,20 @@ export default function DashboardPage() {
 /* ═══════════════════════ ADMIN DASHBOARD ═══════════════════════ */
 function AdminDashboard() {
   const { profile } = useAuth();
-  const [stats, setStats] = useState({ students: 0, courses: 0, faculty: 0, sessions: 0 });
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [stats, setStats] = useState<Record<string, number | string>>({
+    students: '—', courses: '—', faculty: '—', sessions: '—'
+  });
 
   useEffect(() => {
     if (!profile) return;
     const fetchStats = async () => {
       try {
-        const res = await fetch('/api/admin/stats', { credentials: 'include' });
-        if (res.ok) setStats(await res.json());
+        const coursesData = await apiFetch<any>('/courses');
+        const courses = Array.isArray(coursesData) ? coursesData.length : (coursesData.courses?.length ?? '—');
+        setStats(prev => ({ ...prev, courses }));
       } catch {}
     };
     fetchStats();
-    const interval = setInterval(fetchStats, 30000);
-    return () => clearInterval(interval);
   }, [profile]);
 
   return (
@@ -165,10 +166,10 @@ function AdminDashboard() {
       {/* Secondary KPIs Row */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Revenue', value: '₹0', icon: DollarSign, fg: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
-          { label: 'Attendance', value: '0%', icon: Percent, fg: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
-          { label: 'Tests Done', value: '0', icon: FileText, fg: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
-          { label: 'Alerts', value: '0', icon: AlertTriangle, fg: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200' },
+          { label: 'Revenue', value: '—', icon: DollarSign, fg: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+          { label: 'Attendance', value: '—', icon: Percent, fg: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+          { label: 'Tests Done', value: '—', icon: FileText, fg: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
+          { label: 'Alerts', value: '—', icon: AlertTriangle, fg: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200' },
         ].map((kpi, i) => (
           <motion.div
             key={kpi.label}
@@ -189,7 +190,7 @@ function AdminDashboard() {
       {/* Quick Admin Actions */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Students', path: '/students', icon: Users, bg: 'bg-blue-50', fg: 'text-blue-600', border: 'border-blue-200' },
+          { label: 'Courses', path: '/courses', icon: BookOpen, bg: 'bg-violet-50', fg: 'text-violet-600', border: 'border-violet-200' },
           { label: 'Messages', path: '/messages', icon: MessageSquare, bg: 'bg-amber-50', fg: 'text-amber-600', border: 'border-amber-200' },
           { label: 'Library', path: '/digital-library', icon: BookMarked, bg: 'bg-violet-50', fg: 'text-violet-600', border: 'border-violet-200' },
           { label: 'Placements', path: '/placements', icon: GraduationCap, bg: 'bg-emerald-50', fg: 'text-emerald-600', border: 'border-emerald-200' },
@@ -208,12 +209,27 @@ function AdminDashboard() {
 
 /* ═══════════════════════ EDUCATOR DASHBOARD ═══════════════════════ */
 function EducatorDashboard() {
+  const { profile } = useAuth();
+  const [courses, setCourses] = useState<number | string>('—');
+
+  useEffect(() => {
+    if (!profile) return;
+    const fetchCourses = async () => {
+      try {
+        const data = await apiFetch<any>('/courses');
+        const list = Array.isArray(data) ? data : (data.courses ?? []);
+        setCourses(list.length);
+      } catch { setCourses('—'); }
+    };
+    fetchCourses();
+  }, [profile]);
+
   return (
     <div className="space-y-3">
       {/* Educator KPIs */}
       <div className="grid grid-cols-2 gap-2">
         {[
-          { label: 'My Courses', value: '—', icon: BookOpen, bg: 'bg-blue-50', fg: 'text-blue-600', border: 'border-blue-200' },
+          { label: 'My Courses', value: courses, icon: BookOpen, bg: 'bg-blue-50', fg: 'text-blue-600', border: 'border-blue-200' },
           { label: 'Total Students', value: '—', icon: Users, bg: 'bg-emerald-50', fg: 'text-emerald-600', border: 'border-emerald-200' },
           { label: 'Sessions Held', value: '—', icon: Video, bg: 'bg-violet-50', fg: 'text-violet-600', border: 'border-violet-200' },
           { label: 'Feedback Given', value: '—', icon: MessageSquare, bg: 'bg-amber-50', fg: 'text-amber-600', border: 'border-amber-200' },
@@ -256,12 +272,27 @@ function EducatorDashboard() {
 
 /* ═══════════════════════ STUDENT/PARENT DASHBOARD ═══════════════════════ */
 function StudentParentDashboard() {
+  const { profile } = useAuth();
+  const [courses, setCourses] = useState<number | string>('—');
+
+  useEffect(() => {
+    if (!profile) return;
+    const fetchCourses = async () => {
+      try {
+        const data = await apiFetch<any>('/courses');
+        const list = Array.isArray(data) ? data : (data.courses ?? []);
+        setCourses(list.length);
+      } catch { setCourses('—'); }
+    };
+    fetchCourses();
+  }, [profile]);
+
   return (
     <div className="space-y-3">
       {/* Student KPIs */}
       <div className="grid grid-cols-2 gap-2">
         {[
-          { label: 'Attendance', value: '—', icon: ClipboardCheck, bg: 'bg-emerald-50', fg: 'text-emerald-600', border: 'border-emerald-200' },
+          { label: 'My Courses', value: courses, icon: BookOpen, bg: 'bg-blue-50', fg: 'text-blue-600', border: 'border-blue-200' },
           { label: 'Avg Score', value: '—', icon: BarChart3, bg: 'bg-blue-50', fg: 'text-blue-600', border: 'border-blue-200' },
           { label: 'Tests Taken', value: '—', icon: FileText, bg: 'bg-violet-50', fg: 'text-violet-600', border: 'border-violet-200' },
           { label: 'Fees Due', value: '—', icon: Coins, bg: 'bg-rose-50', fg: 'text-rose-600', border: 'border-rose-200' },
@@ -285,10 +316,10 @@ function StudentParentDashboard() {
       {/* Secondary KPIs */}
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: 'Certificates', value: '0', icon: Award, fg: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
-          { label: 'Lectures', value: '0', icon: Clock, fg: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
+          { label: 'Certificates', value: '—', icon: Award, fg: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
+          { label: 'Lectures', value: '—', icon: Clock, fg: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
           { label: 'Rank', value: '—', icon: TrendingUp, fg: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
-          { label: 'Streak', value: '0d', icon: Zap, fg: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
+          { label: 'Streak', value: '—', icon: Zap, fg: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
         ].map((kpi, i) => (
           <motion.div
             key={kpi.label}
@@ -318,12 +349,9 @@ function ActiveSessionsMini() {
     if (!profile) return;
     const fetchSessions = async () => {
       try {
-        const res = await fetch('/api/sessions', { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          const active = (Array.isArray(data) ? data : []).filter((s: any) => s.isActive);
-          setSessions(active.slice(0, 2));
-        }
+        const data = await apiFetch<any>('/sessions');
+        const active = (Array.isArray(data) ? data : []).filter((s: any) => s.isActive);
+        setSessions(active.slice(0, 2));
       } catch { setSessions([]); }
     };
     fetchSessions();
@@ -413,11 +441,8 @@ function RecentMessages() {
     if (!profile) return;
     const fetchMessages = async () => {
       try {
-        const res = await fetch('/api/messages', { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          setMessages((data.messages || []).slice(0, 3));
-        }
+        const data = await apiFetch<any>('/messages');
+        setMessages((data.messages || []).slice(0, 3));
       } catch { setMessages([]); }
     };
     fetchMessages();

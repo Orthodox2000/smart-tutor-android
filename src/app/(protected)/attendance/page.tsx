@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ClipboardCheck, CheckCircle, XCircle, Clock, Calendar } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { apiFetch } from '../../../lib/api';
 
 export default function AttendancePage() {
   const { profile } = useAuth();
@@ -17,13 +18,9 @@ export default function AttendancePage() {
   const fetchAttendance = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/attendance', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setSheets(data.sheets || data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch attendance:', error);
+      const data = await apiFetch<any>('/attendance');
+      setSheets(data.sheets || data || []);
+    } catch {
     } finally {
       setLoading(false);
     }

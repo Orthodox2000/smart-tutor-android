@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 export type UserRole = 'student' | 'educator' | 'admin' | 'parent';
 
@@ -43,22 +44,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch('/api/auth/session', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) {
-          setProfile(data.user);
-          setUser({ id: data.user.id, uid: data.user.uid, email: data.user.email });
-        } else {
-          setProfile(null);
-          setUser(null);
-        }
+      const data = await apiFetch<{ user: UserProfile | null }>('/auth/session');
+      if (data.user) {
+        setProfile(data.user);
+        setUser({ id: data.user.id, uid: data.user.uid, email: data.user.email });
       } else {
         setProfile(null);
         setUser(null);
       }
-    } catch (err) {
-      console.error('Failed to fetch profile:', err);
+    } catch {
       setProfile(null);
       setUser(null);
     } finally {
@@ -73,17 +67,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (identifier: string, pass: string, role?: string) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
+      const data = await apiFetch<{ user: UserProfile }>('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ login: identifier, password: pass, role: role || 'student' }),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
 
       setProfile(data.user);
       setUser({ id: data.user.id, uid: data.user.uid, email: data.user.email });
@@ -97,11 +84,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      await apiFetch('/auth/logout', { method: 'POST' });
       setUser(null);
       setProfile(null);
-    } catch (err) {
-      console.error('Logout failed:', err);
+    } catch {
+      setUser(null);
+      setProfile(null);
     } finally {
       setLoading(false);
     }

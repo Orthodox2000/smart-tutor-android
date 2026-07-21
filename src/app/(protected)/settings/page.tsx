@@ -9,6 +9,7 @@ import {
   X, Loader2, Phone, Calendar, BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import PageBackButton from '../../../components/PageBackButton';
 import { apiFetch } from '../../../lib/api';
 
 export default function SettingsPage() {
@@ -18,9 +19,12 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 pb-20 animate-fade-in">
-      <header>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{t('settings.subtitle')}</p>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('settings.title')}</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{t('settings.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('settings.title')}</h1>
+        </div>
       </header>
 
       <div className="space-y-4">

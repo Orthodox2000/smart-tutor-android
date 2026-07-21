@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 
 type PaymentTransaction = {
   paidAmount: number;
@@ -86,7 +87,7 @@ function numberToWords(n: number): string {
 }
 
 function downloadInvoiceReceipt(invoice: FeeInvoice) {
-  const popup = window.open('', '_blank', 'width=1280,height=900');
+  const popup = window.open('', '_blank', 'width=900,height=800,scrollbars=yes');
   if (!popup) return;
 
   const paidAmount = invoice.paidAmount ?? 0;
@@ -146,35 +147,39 @@ function downloadInvoiceReceipt(invoice: FeeInvoice) {
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fee Receipt - ${escapeHtml(receiptNo)}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { padding: 24px; background: #e5e7eb; color: #111827; font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .receipt-wrap { max-width: 850px; margin: 0 auto; background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .receipt-box { border: 1.5px solid ${NAVY}; margin: 8px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .sec-head { background: ${NAVY} !important; color: #fff !important; padding: 6px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .detail-cell { flex: 1; display: flex; padding: 7px 12px; align-items: center; }
+    html, body { width: 100%; overflow-x: hidden; }
+    body { padding: 16px; background: #e5e7eb; color: #111827; font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .receipt-wrap { max-width: 850px; width: 100%; margin: 0 auto; background: #fff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .receipt-box { border: 1.5px solid ${NAVY}; margin: 8px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; overflow: hidden; }
+    .sec-head { background: ${NAVY} !important; color: #fff !important; padding: 6px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; white-space: nowrap; }
+    .detail-cell { flex: 1; display: flex; padding: 6px 10px; align-items: center; min-width: 0; overflow: hidden; }
     .detail-cell:first-child { border-right: 1px solid #d1d5db; }
-    .detail-lbl { width: 120px; font-weight: 700; color: #374151; white-space: nowrap; }
-    .detail-sep { margin: 0 6px; color: #9ca3af; }
-    .detail-val { color: #475569; }
-    .fee-th { border: 1px solid #d1d5db; padding: 8px 10px; background: ${NAVY} !important; color: #fff !important; font-weight: 600; text-align: center; font-size: 12px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .fee-td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: center; font-size: 13px; }
-    .hist-th { padding: 8px 10px; border: 1px solid #d1d5db; background: #f1f5f9 !important; font-size: 12px; text-align: center; font-weight: 700; color: #334155; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .hist-td { padding: 8px 10px; border: 1px solid #d1d5db; text-align: center; font-size: 13px; }
-    .badge { display: inline-block; padding: 3px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .detail-lbl { width: 100px; font-weight: 700; color: #374151; white-space: nowrap; flex-shrink: 0; font-size: 11px; }
+    .detail-sep { margin: 0 4px; color: #9ca3af; flex-shrink: 0; }
+    .detail-val { color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+    .fee-th { border: 1px solid #d1d5db; padding: 6px 8px; background: ${NAVY} !important; color: #fff !important; font-weight: 600; text-align: center; font-size: 11px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; white-space: nowrap; }
+    .fee-td { border: 1px solid #d1d5db; padding: 6px 8px; text-align: center; font-size: 12px; word-break: break-word; }
+    .hist-th { padding: 6px 8px; border: 1px solid #d1d5db; background: #f1f5f9 !important; font-size: 11px; text-align: center; font-weight: 700; color: #334155; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; white-space: nowrap; }
+    .hist-td { padding: 6px 8px; border: 1px solid #d1d5db; text-align: center; font-size: 12px; word-break: break-word; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; white-space: nowrap; }
     .print-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 24px; background: ${NAVY} !important; color: #fff !important; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 20px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .fee-table-wrap { overflow-x: auto; width: 100%; }
     @media print {
-      body { padding: 0; background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      html, body { width: 100%; overflow: visible; padding: 0; background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .print-btn { display: none !important; }
-      .receipt-wrap { margin: 0; border: none; }
+      .receipt-wrap { margin: 0; border: none; max-width: none; width: 100%; }
       .receipt-box { margin: 0; border: none; }
       .receipt-box img { width: 100% !important; height: auto !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      .detail-val, .fee-td, .hist-td { white-space: normal !important; word-break: break-word !important; overflow: visible !important; }
     }
   </style>
 </head>
 <body>
-  <div style="max-width:850px;margin:0 auto;">
+  <div style="max-width:850px;width:100%;margin:0 auto;">
     <button class="print-btn" onclick="window.print();">Print Receipt</button>
   </div>
   <div class="receipt-wrap">
@@ -182,14 +187,14 @@ function downloadInvoiceReceipt(invoice: FeeInvoice) {
       <div style="width:100%;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
         <img src="${escapeHtml(logoUrl)}" alt="Smart Tutors" style="width:100%;display:block;height:auto;" />
       </div>
-      <div style="padding:20px 24px;">
-        <div style="text-align:center;font-size:22px;font-weight:900;color:${NAVY};margin:12px 0 14px;letter-spacing:0.08em;">FEE RECEIPT</div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#1e293b;margin-bottom:14px;">
-          <div><span>Receipt No.</span><span style="margin:0 8px;">:</span><span style="font-weight:500;color:#475569;">${escapeHtml(receiptNo)}</span></div>
-          <div><span>Receipt Date</span><span style="margin:0 8px;">:</span><span style="font-weight:500;color:#475569;">${escapeHtml(formatReceiptDate(invoice.createdAt || invoice.dueDate))}</span></div>
+      <div style="padding:16px 20px;">
+        <div style="text-align:center;font-size:20px;font-weight:900;color:${NAVY};margin:10px 0 12px;letter-spacing:0.08em;">FEE RECEIPT</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:12px;flex-wrap:wrap;gap:4px;">
+          <div><span>Receipt No.</span><span style="margin:0 6px;">:</span><span style="font-weight:500;color:#475569;">${escapeHtml(receiptNo)}</span></div>
+          <div><span>Receipt Date</span><span style="margin:0 6px;">:</span><span style="font-weight:500;color:#475569;">${escapeHtml(formatReceiptDate(invoice.createdAt || invoice.dueDate))}</span></div>
         </div>
         <div class="sec-head">Student Details</div>
-        <div style="border:1px solid #d1d5db;font-size:13px;margin-bottom:16px;">
+        <div style="border:1px solid #d1d5db;font-size:12px;margin-bottom:14px;">
           <div style="display:flex;border-bottom:1px solid #d1d5db;">
             <div class="detail-cell" style="border-right:1px solid #d1d5db;"><span class="detail-lbl">Student Name</span><span class="detail-sep">:</span><span class="detail-val">${escapeHtml(invoice.studentName || '\u2014')}</span></div>
             <div class="detail-cell"><span class="detail-lbl">Parent Name</span><span class="detail-sep">:</span><span class="detail-val">${escapeHtml(invoice.parentName || '\u2014')}</span></div>
@@ -208,72 +213,74 @@ function downloadInvoiceReceipt(invoice: FeeInvoice) {
           </div>
         </div>
         <div class="sec-head">Fee Details</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid #d1d5db;">
-          <thead>
-            <tr>
-              <th class="fee-th" style="width:50px;">Sr No.</th>
-              <th class="fee-th" style="text-align:left;">Particulars</th>
-              <th class="fee-th">Month</th>
-              <th class="fee-th">Due Date</th>
-              <th class="fee-th" style="text-align:right;">Amount</th>
-              <th class="fee-th" style="text-align:right;">Paid</th>
-              <th class="fee-th" style="text-align:right;">Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="fee-td">1</td>
-              <td class="fee-td" style="text-align:left;font-weight:600;">${escapeHtml(invoice.title || 'Fee')}${invoice.particulars ? ' \u2014 ' + escapeHtml(invoice.particulars) : ''}</td>
-              <td class="fee-td">${escapeHtml(invoice.month || '\u2014')}</td>
-              <td class="fee-td">${escapeHtml(formatReceiptDate(invoice.dueDate))}</td>
-              <td class="fee-td" style="text-align:right;font-weight:700;">${escapeHtml(formatCurrency(invoice.amount))}</td>
-              <td class="fee-td" style="text-align:right;font-weight:700;">${escapeHtml(formatCurrency(paidAmount))}</td>
-              <td class="fee-td" style="text-align:right;font-weight:700;color:${balance > 0 ? '#dc2626' : '#16a34a'};">${escapeHtml(formatCurrency(balance))}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;padding:8px 12px;background:#f8fafc !important;border:1px solid #d1d5db;border-top:none;margin-bottom:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">
-          <span style="color:#374151;white-space:nowrap;">Amount in Words :</span>
-          <span style="color:#475569;font-weight:500;">${escapeHtml(amountInWords)}</span>
+        <div class="fee-table-wrap">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid #d1d5db;table-layout:fixed;">
+            <thead>
+              <tr>
+                <th class="fee-th" style="width:36px;">#</th>
+                <th class="fee-th" style="text-align:left;">Particulars</th>
+                <th class="fee-th">Month</th>
+                <th class="fee-th">Due Date</th>
+                <th class="fee-th" style="text-align:right;">Amount</th>
+                <th class="fee-th" style="text-align:right;">Paid</th>
+                <th class="fee-th" style="text-align:right;">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="fee-td">1</td>
+                <td class="fee-td" style="text-align:left;font-weight:600;">${escapeHtml(invoice.title || 'Fee')}${invoice.particulars ? ' \u2014 ' + escapeHtml(invoice.particulars) : ''}</td>
+                <td class="fee-td">${escapeHtml(invoice.month || '\u2014')}</td>
+                <td class="fee-td">${escapeHtml(formatReceiptDate(invoice.dueDate))}</td>
+                <td class="fee-td" style="text-align:right;font-weight:700;">${escapeHtml(formatCurrency(invoice.amount))}</td>
+                <td class="fee-td" style="text-align:right;font-weight:700;">${escapeHtml(formatCurrency(paidAmount))}</td>
+                <td class="fee-td" style="text-align:right;font-weight:700;color:${balance > 0 ? '#dc2626' : '#16a34a'};">${escapeHtml(formatCurrency(balance))}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;color:#1e293b;padding:10px 2px;border-top:2px solid ${NAVY};margin-bottom:4px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="color:#64748b;">Payment Status</span><span style="color:#9ca3af;margin:0 2px;">:</span>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;padding:8px 10px;background:#f8fafc !important;border:1px solid #d1d5db;border-top:none;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact;flex-wrap:wrap;">
+          <span style="color:#374151;white-space:nowrap;">Amount in Words :</span>
+          <span style="color:#475569;font-weight:500;word-break:break-word;">${escapeHtml(amountInWords)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:#1e293b;padding:8px 2px;border-top:2px solid ${NAVY};margin-bottom:4px;flex-wrap:wrap;gap:6px;">
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span style="color:#64748b;">Status</span><span style="color:#9ca3af;margin:0 2px;">:</span>
             <span class="badge" style="${badgeStyle}">${escapeHtml(statusLabel)}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="color:#64748b;">Total Paid</span><span style="color:#9ca3af;margin:0 2px;">:</span>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span style="color:#64748b;">Paid</span><span style="color:#9ca3af;margin:0 2px;">:</span>
             <span style="font-weight:800;color:#16a34a;">${escapeHtml(formatCurrency(paidAmount))}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="color:#64748b;">Balance Due</span><span style="color:#9ca3af;margin:0 2px;">:</span>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span style="color:#64748b;">Balance</span><span style="color:#9ca3af;margin:0 2px;">:</span>
             <span style="font-weight:800;color:${balance > 0 ? '#dc2626' : '#16a34a'};">${escapeHtml(formatCurrency(balance))}</span>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#1e293b;padding:4px 2px 16px;border-bottom:1px solid #e5e7eb;margin-bottom:20px;">
-          <div><span style="color:#64748b;">Due Date</span><span style="color:#d1d5db;margin:0 4px;">:</span><span>${escapeHtml(formatReceiptDate(invoice.dueDate))}</span></div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700;color:#1e293b;padding:4px 2px 12px;border-bottom:1px solid #e5e7eb;margin-bottom:16px;flex-wrap:wrap;">
+          <div><span style="color:#64748b;">Due</span><span style="color:#d1d5db;margin:0 4px;">:</span><span>${escapeHtml(formatReceiptDate(invoice.dueDate))}</span></div>
           <span style="color:#d1d5db;">|</span>
-          <div><span style="color:#64748b;">Print Date</span><span style="color:#d1d5db;margin:0 4px;">:</span><span>${escapeHtml(printDateStr)}</span></div>
+          <div><span style="color:#64748b;">Printed</span><span style="color:#d1d5db;margin:0 4px;">:</span><span>${escapeHtml(printDateStr)}</span></div>
         </div>
         ${renderTransactionRows()}
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:16px 24px 0;border-top:2px solid ${NAVY};margin-top:16px;min-height:120px;">
-        <div style="max-width:50%;font-size:11px;font-weight:600;color:#64748b;">
-          <p style="margin:3px 0;">This is a computer-generated receipt and does not require a physical signature.</p>
-          <p style="margin:3px 0;font-weight:800;color:#1e293b;font-size:12px;">FEES ONCE PAID ARE NON-REFUNDABLE UNDER ANY CIRCUMSTANCES.</p>
-          <p style="margin:8px 3px 3px;">Thank you for choosing Smart Tutors Pvt. Ltd.</p>
-          <p style="margin:3px 0;">We appreciate your trust.</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:14px 20px 0;border-top:2px solid ${NAVY};margin-top:12px;min-height:100px;flex-wrap:wrap;gap:16px;">
+        <div style="max-width:50%;font-size:10px;font-weight:600;color:#64748b;min-width:200px;">
+          <p style="margin:2px 0;">This is a computer-generated receipt and does not require a physical signature.</p>
+          <p style="margin:2px 0;font-weight:800;color:#1e293b;font-size:11px;">FEES ONCE PAID ARE NON-REFUNDABLE UNDER ANY CIRCUMSTANCES.</p>
+          <p style="margin:6px 2px 2px;">Thank you for choosing Smart Tutors Pvt. Ltd.</p>
+          <p style="margin:2px 0;">We appreciate your trust.</p>
         </div>
-        <div style="text-align:center;width:220px;">
-          <img src="${escapeHtml(signatureUrl)}" alt="Founder Signature" style="display:block;width:180px;height:64px;margin:0 auto 6px;object-fit:contain;" />
-          <div style="border-top:1.5px solid #334155;margin-top:4px;padding-top:6px;">
-            <div style="font-size:13px;font-weight:800;color:#1e293b;">Mr. Ravi Rana</div>
-            <div style="font-size:11px;color:#64748b;margin-top:1px;">Director &amp; Founder</div>
-            <div style="font-size:11px;color:#64748b;margin-top:1px;">Smart Tutors Pvt. Ltd.</div>
+        <div style="text-align:center;width:180px;">
+          <img src="${escapeHtml(signatureUrl)}" alt="Founder Signature" style="display:block;width:160px;height:56px;margin:0 auto 6px;object-fit:contain;" />
+          <div style="border-top:1.5px solid #334155;margin-top:4px;padding-top:4px;">
+            <div style="font-size:12px;font-weight:800;color:#1e293b;">Mr. Ravi Rana</div>
+            <div style="font-size:10px;color:#64748b;margin-top:1px;">Director &amp; Founder</div>
+            <div style="font-size:10px;color:#64748b;margin-top:1px;">Smart Tutors Pvt. Ltd.</div>
           </div>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;padding:10px 24px 14px;">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;padding:8px 20px 10px;flex-wrap:wrap;gap:4px;">
         <span>Smart Tutors Pvt. Ltd. | CIN: U80100MH2019PTC321658</span>
         <span>www.smarttutors.co.in</span>
       </div>
@@ -364,19 +371,24 @@ export default function FeesPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Financial Overview</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Fees & Invoices</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Financial Overview</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Fees & Invoices</h1>
+            </div>
+            {profile?.role === 'admin' && (
+              <button
+                onClick={() => setShowCreate(true)}
+                className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
+              >
+                <Plus size={24} />
+              </button>
+            )}
+          </div>
         </div>
-        {profile?.role === 'admin' && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
-          >
-            <Plus size={24} />
-          </button>
-        )}
       </header>
 
       {/* Summary Stats */}

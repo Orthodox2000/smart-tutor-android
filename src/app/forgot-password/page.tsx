@@ -37,8 +37,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex justify-center bg-slate-200 min-h-screen">
-      <div className="w-full max-w-[430px] bg-white min-h-screen relative overflow-hidden shadow-2xl flex flex-col">
+    <div className="flex justify-center bg-slate-200 h-[100dvh] h-screen">
+      <div className="w-full max-w-[430px] bg-white h-full relative overflow-hidden shadow-2xl flex flex-col" style={{ height: '100%' }}>
         
         <div className="absolute top-0 right-0 w-64 h-64 bg-academy-orange-50 rounded-full blur-3xl -mr-32 -mt-16 opacity-60"></div>
 

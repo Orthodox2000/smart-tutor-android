@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../lib/mongodb';
-import LibraryItem from '../../../models/LibraryItem';
-import { getSessionUser } from '../../../lib/api-helpers';
+import connectToDatabase from '../src/lib/mongodb';
+import LibraryItem from '../src/models/LibraryItem';
+import { getSessionUser } from '../src/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +9,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
+    
+    const session = getSessionUser(request);
+    const isLoggedIn = !!session;
+    const canManage = isLoggedIn && (session!.role === 'admin' || session!.role === 'educator');
+    const role = session?.role || null;
     
     await connectToDatabase();
     
@@ -18,7 +23,17 @@ export async function GET(request: Request) {
     }
     
     const items = await LibraryItem.find(filter).sort({ createdAt: -1 });
-    return NextResponse.json(items);
+    const books = items.map((item: any) => {
+      const obj = item.toObject();
+      return {
+        ...obj,
+        downloadUrl: obj.megaFileUrl || null,
+        thumbnailUrl: obj.thumbnailUrl || null,
+        price: obj.price || null,
+        categoryLabel: obj.categoryLabel || obj.category || 'Other',
+      };
+    });
+    return NextResponse.json({ success: true, books, canManage, isLoggedIn, role });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

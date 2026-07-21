@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { Calendar, Video, Plus, X, ExternalLink, Clock } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 
 export default function LecturesPage() {
   const { profile } = useAuth();
@@ -52,19 +53,24 @@ export default function LecturesPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Class Schedule</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Lectures</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Class Schedule</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Lectures</h1>
+            </div>
+            {(profile?.role === 'admin' || profile?.role === 'educator') && (
+              <button 
+                onClick={() => setShowCreate(!showCreate)}
+                className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg"
+              >
+                {showCreate ? <X size={24} /> : <Plus size={24} />}
+              </button>
+            )}
+          </div>
         </div>
-        {(profile?.role === 'admin' || profile?.role === 'educator') && (
-          <button 
-            onClick={() => setShowCreate(!showCreate)}
-            className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg"
-          >
-            {showCreate ? <X size={24} /> : <Plus size={24} />}
-          </button>
-        )}
       </header>
 
       {showCreate && (

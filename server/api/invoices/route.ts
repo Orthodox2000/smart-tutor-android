@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionUser, getCollection, normalizeDoc } from '../../../lib/api-helpers';
+import { getSessionUser, getCollection, normalizeDoc } from '../src/lib/api-helpers';
 import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';

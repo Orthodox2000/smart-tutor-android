@@ -9,6 +9,7 @@ import {
   Link as LinkIcon
 } from 'lucide-react';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function SessionsPage() {
@@ -59,19 +60,24 @@ export default function SessionsPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <header className="flex items-center justify-between">
-        <div>
-           <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Live Learning</p>
-           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Active Sessions</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+               <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Live Learning</p>
+               <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Active Sessions</h1>
+            </div>
+            {(profile?.role === 'admin' || profile?.role === 'educator') && (
+               <button 
+                 onClick={() => setShowCreate(true)}
+                 className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
+               >
+                  <Plus size={24} />
+               </button>
+            )}
+          </div>
         </div>
-        {(profile?.role === 'admin' || profile?.role === 'educator') && (
-           <button 
-             onClick={() => setShowCreate(true)}
-             className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
-           >
-              <Plus size={24} />
-           </button>
-        )}
       </header>
 
       <AnimatePresence>

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../../lib/mongodb';
-import User from '../../../../models/User';
+import connectToDatabase from '../src/lib/mongodb';
+import User from '../src/models/User';
 import bcrypt from 'bcryptjs';
-import { getSessionUser } from '../../../../lib/api-helpers';
+import { getSessionUser } from '../src/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 

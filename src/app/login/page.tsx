@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   if (authLoading || profile) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center h-[100dvh] h-screen bg-slate-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-academy-orange-600"></div>
       </div>
     );
@@ -59,8 +59,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-slate-200 min-h-screen">
-      <div className="w-full max-w-[430px] bg-white min-h-screen sm:min-h-0 sm:h-[85vh] sm:max-h-[780px] relative overflow-hidden shadow-2xl flex flex-col items-center justify-center sm:rounded-3xl p-8">
+      <div className="flex items-center justify-center bg-slate-200 h-[100dvh] h-screen">
+        <div className="w-full max-w-[430px] bg-white h-full relative overflow-hidden shadow-2xl flex flex-col items-center justify-center p-8 sm:rounded-3xl sm:h-[85vh] sm:max-h-[780px]" style={{ height: '100%' }}>
         
         <div className="absolute top-0 right-0 w-64 h-64 bg-academy-orange-50 rounded-full blur-3xl -mr-32 -mt-16 opacity-60"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-academy-red-50 rounded-full blur-3xl -ml-32 -mb-16 opacity-60"></div>

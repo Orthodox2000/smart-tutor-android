@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../../lib/mongodb';
-import User from '../../../../models/User';
-import Course from '../../../../models/Course';
-import LibraryItem from '../../../../models/LibraryItem';
-import Test from '../../../../models/Test';
+import connectToDatabase from '../src/lib/mongodb';
+import User from '../src/models/User';
+import Course from '../src/models/Course';
+import LibraryItem from '../src/models/LibraryItem';
+import Test from '../src/models/Test';
 
 export const dynamic = 'force-dynamic';
 

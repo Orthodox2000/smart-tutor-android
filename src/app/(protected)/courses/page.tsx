@@ -5,6 +5,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, User, DollarSign, Plus, Search, Filter } from 'lucide-react';
+import PageBackButton from '../../../components/PageBackButton';
 
 export default function CoursesPage() {
   const { profile } = useAuth();
@@ -20,25 +21,40 @@ export default function CoursesPage() {
     setLoading(true);
     try {
       const data = await apiFetch('/courses');
-      setCourses(Array.isArray(data) ? data : []);
+      const normalized = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.courses)
+        ? data.courses
+        : Array.isArray(data?.items)
+        ? data.items
+        : [];
+      setCourses(normalized);
     } catch {
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredCourses = courses.filter(c => 
-    c.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCourses = courses.filter(c => {
+    const q = searchTerm.toLowerCase();
+    return (
+      c.title?.toLowerCase().includes(q) ||
+      c.name?.toLowerCase().includes(q) ||
+      c.subject?.toLowerCase().includes(q) ||
+      c.category?.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Explore Courses</h1>
-          <p className="text-slate-500 text-sm">Pick a course to start your learning journey.</p>
-        </div>
+      <div className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Explore Courses</h1>
+              <p className="text-slate-500 text-sm">Pick a course to start your learning journey.</p>
+            </div>
         
         {(profile?.role === 'admin' || profile?.role === 'educator') && (
           <button 
@@ -47,6 +63,8 @@ export default function CoursesPage() {
             <Plus size={20} /> Create New Course
           </button>
         )}
+      </div>
+        </div>
       </div>
 
       <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
@@ -104,13 +122,20 @@ function CourseCard({ course, index }: { course: any; index: number }) {
       className={`bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-all cursor-pointer group flex flex-col ${isExpanded ? 'col-span-2' : 'h-full'}`}
     >
       <div className="flex-1">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-slate-100 text-slate-600 rounded-lg">
-            {course.category || 'General'}
-          </span>
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          {(course.subject || course.category) && (
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-slate-100 text-slate-600 rounded-lg">
+              {course.subject || course.category || 'General'}
+            </span>
+          )}
+          {course.batchNumber && (
+            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-orange-50 text-orange-600 rounded-lg">
+              Batch {course.batchNumber}
+            </span>
+          )}
         </div>
         <h3 className="font-bold text-slate-900 leading-tight mb-2 group-hover:text-slate-900 transition-colors">
-          {course.title}
+          {course.title || course.name}
         </h3>
         <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
           {course.summary || course.description}
@@ -159,9 +184,15 @@ function CourseCard({ course, index }: { course: any; index: number }) {
                   <p className="text-xs font-bold text-slate-700">{course.duration || 'Flexible'}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Mode</p>
-                  <p className="text-xs font-bold text-slate-700">{course.mode || 'Offline'}</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Price</p>
+                  <p className="text-xs font-bold text-slate-700">{course.price != null && course.price !== 0 ? `$${course.price}` : 'Free'}</p>
                 </div>
+                {course.educatorName && (
+                  <div className="col-span-2">
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Educator</p>
+                    <p className="text-xs font-bold text-slate-700">{course.educatorName}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -174,9 +205,9 @@ function CourseCard({ course, index }: { course: any; index: number }) {
               <BookOpen size={14} />
               <span className="text-[10px] font-bold uppercase tracking-wider">Tap to Expand</span>
            </div>
-           <div className="w-8 h-8 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all">
-              <Plus size={16} />
-           </div>
+           <span className="text-xs font-black text-slate-900">
+             {course.price != null && course.price !== 0 ? `$${course.price}` : 'Free'}
+           </span>
         </div>
       )}
     </motion.div>

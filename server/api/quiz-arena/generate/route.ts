@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getCollection, normalizeDoc } from '../../../../lib/api-helpers';
+import { getCollection, normalizeDoc } from '../src/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,10 +1,11 @@
-const API_BASE = 'https://smarttutors.co.in/api';
+const API_BASE = 'https://smart-tutor-android.vercel.app/api';
 
 export async function apiFetch<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
 
   const res = await fetch(url, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,

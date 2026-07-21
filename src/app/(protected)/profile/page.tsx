@@ -4,6 +4,7 @@ import React from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { motion } from 'motion/react';
 import { User, Mail, Shield, Calendar, LogOut } from 'lucide-react';
+import PageBackButton from '../../../components/PageBackButton';
 
 export default function ProfilePage() {
   const { profile, logout } = useAuth();
@@ -23,9 +24,12 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-8 pb-20">
-      <header>
-        <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Account & Security</p>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Identity Profile</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Account & Security</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Identity Profile</h1>
+        </div>
       </header>
 
       <div className="space-y-6">

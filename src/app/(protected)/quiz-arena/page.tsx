@@ -1,24 +1,106 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Clock, CheckCircle, ArrowRight, Sparkles, Send } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, ArrowRight, Sparkles, Send, GraduationCap, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
 const SUBJECTS = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Geography', 'Computer Science'];
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 
+const CLASSES = [
+  { id: 'class-6', label: 'Class 6', difficulty: 'Easy' },
+  { id: 'class-7', label: 'Class 7', difficulty: 'Easy' },
+  { id: 'class-8', label: 'Class 8', difficulty: 'Easy' },
+  { id: 'class-9', label: 'Class 9', difficulty: 'Medium' },
+  { id: 'class-10', label: 'Class 10', difficulty: 'Medium' },
+  { id: 'class-11', label: 'Class 11', difficulty: 'Hard' },
+  { id: 'class-12', label: 'Class 12', difficulty: 'Hard' },
+  { id: 'competitive', label: 'Competitive', difficulty: 'Hard' },
+  { id: 'jee', label: 'JEE', difficulty: 'Hard' },
+  { id: 'neet', label: 'NEET', difficulty: 'Hard' },
+];
+
 export default function QuizArenaPage() {
   const { profile } = useAuth();
-  const [step, setStep] = useState<'config' | 'quiz' | 'result'>('config');
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [step, setStep] = useState<'class' | 'config' | 'quiz' | 'result'>('class');
   const [config, setConfig] = useState({ level: 'Intermediate', exam: '', subject: 'Mathematics', difficulty: 'Medium', count: 10 });
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('quiz-arena-selected-class');
+    if (saved) {
+      setSelectedClass(saved);
+      const classData = CLASSES.find(c => c.id === saved);
+      if (classData) {
+        setConfig(prev => ({ ...prev, difficulty: classData.difficulty }));
+        setStep('config');
+      }
+    }
+  }, []);
+
+  const handleClassSelect = (classId: string) => {
+    setSelectedClass(classId);
+    localStorage.setItem('quiz-arena-selected-class', classId);
+    const classData = CLASSES.find(c => c.id === classId)!;
+    setConfig(prev => ({ ...prev, difficulty: classData.difficulty }));
+    setStep('config');
+  };
+
+  const handleChangeClass = () => {
+    localStorage.removeItem('quiz-arena-selected-class');
+    setSelectedClass(null);
+    setStep('class');
+  };
+
+  if (step === 'class') {
+    return (
+      <div className="space-y-6 pb-20">
+        <header className="flex items-center gap-2">
+          <PageBackButton />
+          <div className="flex-1">
+            <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Quiz Arena</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Select Your Class</h1>
+          </div>
+        </header>
+
+        <div className="bg-slate-900 p-6 rounded-2xl text-white">
+          <GraduationCap size={24} className="text-academy-orange-400 mb-3" />
+          <h3 className="font-bold text-lg mb-1">Choose Your Class</h3>
+          <p className="text-xs text-slate-400">Select your class to get quizzes at the right difficulty level.</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {CLASSES.map((cls, index) => (
+            <motion.button
+              key={cls.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              onClick={() => handleClassSelect(cls.id)}
+              className="bg-white border border-slate-200 rounded-2xl p-5 text-center hover:border-academy-orange-300 hover:bg-academy-orange-50 transition-all group"
+            >
+              <div className="w-12 h-12 bg-slate-100 group-hover:bg-academy-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 transition-colors">
+                <span className="text-lg font-black text-slate-700 group-hover:text-academy-orange-600 transition-colors">
+                  {cls.id === 'competitive' || cls.id === 'jee' || cls.id === 'neet' ? '🏆' : cls.label.replace('Class ', '')}
+                </span>
+              </div>
+              <p className="font-bold text-sm text-slate-900">{cls.label}</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{cls.difficulty}</p>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const startQuiz = async () => {
     setLoading(true);
@@ -64,12 +146,36 @@ export default function QuizArenaPage() {
   const score = questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
 
   if (step === 'config') {
+    const currentClass = CLASSES.find(c => c.id === selectedClass);
     return (
       <div className="space-y-6 pb-20">
-        <header>
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">AI Powered</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Quiz Arena</h1>
+        <header className="flex items-center gap-2">
+          <PageBackButton />
+          <div className="flex-1">
+            <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">AI Powered</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Quiz Arena</h1>
+          </div>
         </header>
+
+        {currentClass && (
+          <div className="flex items-center justify-between bg-academy-orange-50 border border-academy-orange-100 rounded-2xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-academy-orange-100 rounded-xl flex items-center justify-center">
+                <GraduationCap size={20} className="text-academy-orange-600" />
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">{currentClass.label}</p>
+                <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest">{currentClass.difficulty} Level</p>
+              </div>
+            </div>
+            <button
+              onClick={handleChangeClass}
+              className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Change <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
 
         <div className="bg-slate-900 p-6 rounded-2xl text-white">
           <Sparkles size={24} className="text-academy-orange-400 mb-3" />
@@ -86,10 +192,14 @@ export default function QuizArenaPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">Difficulty</label>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">Difficulty (Set by Class)</label>
             <div className="flex bg-slate-100 p-1 rounded-2xl">
               {DIFFICULTIES.map(d => (
-                <button key={d} onClick={() => setConfig({...config, difficulty: d})} className={`flex-1 rounded-xl py-3 text-xs font-bold transition-all ${config.difficulty === d ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
+                <button key={d} disabled className={`flex-1 rounded-xl py-3 text-xs font-bold transition-all ${
+                  config.difficulty === d 
+                    ? 'bg-academy-orange-600 text-white shadow-sm' 
+                    : 'text-slate-400 cursor-not-allowed'
+                }`}>
                   {d}
                 </button>
               ))}
@@ -153,6 +263,9 @@ export default function QuizArenaPage() {
           </div>
           <button onClick={() => { setStep('config'); setQuestions([]); }} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm">
             Back to Arena
+          </button>
+          <button onClick={handleChangeClass} className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold text-sm mt-3">
+            Change Class
           </button>
         </div>
       </div>

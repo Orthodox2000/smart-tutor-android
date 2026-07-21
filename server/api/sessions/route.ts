@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../lib/mongodb';
-import Session from '../../../models/Session';
-import { getSessionUser } from '../../../lib/api-helpers';
+import connectToDatabase from '../src/lib/mongodb';
+import Session from '../src/models/Session';
+import { getSessionUser } from '../src/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 

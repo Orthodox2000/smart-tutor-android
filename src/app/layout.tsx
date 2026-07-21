@@ -42,8 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ height: '100%', overflow: 'hidden' }}>
+      <body className="font-sans antialiased" suppressHydrationWarning style={{ height: '100%', overflow: 'hidden', position: 'fixed', width: '100%', top: 0, left: 0, margin: 0, padding: 0 }}>
         <Providers>
           <StartupPermissionsPrompt />
           {children}

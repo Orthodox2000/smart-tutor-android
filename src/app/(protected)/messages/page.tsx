@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import PageBackButton from '../../../components/PageBackButton';
 import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, MessageSquare, Megaphone, Trash2, ShieldAlert, Clock, X } from 'lucide-react';
@@ -83,9 +84,12 @@ export default function MessagesPage() {
 
   return (
     <div className="flex flex-col h-full space-y-6 pb-20">
-      <header>
-        <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Communication Hub</p>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Messages & Notices</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Communication Hub</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Messages & Notices</h1>
+        </div>
       </header>
 
       {(profile?.role === 'admin' || profile?.role === 'educator') && (

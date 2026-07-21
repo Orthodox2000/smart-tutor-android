@@ -10,7 +10,6 @@ android
 *.log
 .env*
 !.env.example
-public/
 firebase-blueprint.json 
 /firebase.rules
 backup/

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../lib/mongodb';
-import Message from '../../../models/Message';
+import connectToDatabase from '../src/lib/mongodb';
+import Message from '../src/models/Message';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';

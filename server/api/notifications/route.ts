@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../lib/mongodb';
-import Notification from '../../../models/Notification';
+import connectToDatabase from '../src/lib/mongodb';
+import Notification from '../src/models/Notification';
 import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';

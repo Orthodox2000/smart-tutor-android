@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
+import PageBackButton from '../../../components/PageBackButton';
 import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -181,18 +182,23 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Administrative Center</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Management</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Administrative Center</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Management</h1>
+            </div>
+            <button 
+              onClick={handleOpenAdd}
+              className="flex items-center gap-2 bg-academy-orange-600 text-white px-4 py-2.5 rounded-2xl font-bold text-sm shadow-lg shadow-academy-orange-100 hover:bg-academy-orange-700 transition-all"
+            >
+              <UserPlus size={18} />
+              <span>Add Student</span>
+            </button>
+          </div>
         </div>
-        <button 
-          onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-academy-orange-600 text-white px-4 py-2.5 rounded-2xl font-bold text-sm shadow-lg shadow-academy-orange-100 hover:bg-academy-orange-700 transition-all"
-        >
-          <UserPlus size={18} />
-          <span>Add Student</span>
-        </button>
       </header>
 
       <div className="relative">

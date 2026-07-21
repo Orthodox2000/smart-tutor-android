@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Bell, Megaphone, ShieldAlert, MessageSquare, Check, Trash2 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 import Link from 'next/link';
 
 export default function NotificationsPage() {
@@ -59,9 +60,12 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4 pb-20">
-      <header>
-        <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Stay Updated</p>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Notifications</h1>
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Stay Updated</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Notifications</h1>
+        </div>
       </header>
 
       {loading ? (

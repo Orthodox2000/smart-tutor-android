@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
+import PageBackButton from '../../../components/PageBackButton';
 
 export default function MockTestPage() {
   const { profile } = useAuth();
@@ -75,20 +76,25 @@ export default function MockTestPage() {
 
   return (
     <div className="space-y-8 pb-20 animate-fade-in">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Testing Arena</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tests & Assignments</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={fetchTests} className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center">
-            <RefreshCw size={18} />
-          </button>
-          {(profile?.role === 'admin' || profile?.role === 'educator') && (
-            <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
-              <Plus size={20} />
-            </button>
-          )}
+      <header className="flex items-center gap-2">
+        <PageBackButton />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Testing Arena</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tests & Assignments</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={fetchTests} className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center">
+                <RefreshCw size={18} />
+              </button>
+              {(profile?.role === 'admin' || profile?.role === 'educator') && (
+                <button className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
+                  <Plus size={20} />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 

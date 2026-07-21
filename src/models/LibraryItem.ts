@@ -7,10 +7,13 @@ export interface ILibraryItem extends Document {
   title: string;
   author: string;
   category: string;
+  categoryLabel?: string;
   description: string;
+  thumbnailUrl?: string;
   megaFileId?: string;
   megaFileName: string;
   megaFileUrl: string;
+  price?: string;
   audience: string[];
   createdBy: string;
   createdAt: Date;
@@ -22,10 +25,13 @@ const LibraryItemSchema: Schema = new Schema({
   title: { type: String, required: true },
   author: { type: String, required: true },
   category: { type: String, required: true },
+  categoryLabel: { type: String },
   description: { type: String },
+  thumbnailUrl: { type: String },
   megaFileId: { type: String },
   megaFileName: { type: String, required: true },
   megaFileUrl: { type: String, required: true },
+  price: { type: String },
   audience: [{ type: String, default: ['student', 'educator', 'admin'] }],
   createdBy: { type: String, required: true },
 }, { timestamps: true });

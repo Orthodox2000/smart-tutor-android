@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../../lib/mongodb';
-import User from '../../../../models/User';
-import Course from '../../../../models/Course'; 
-import Session from '../../../../models/Session';
+import connectToDatabase from '../src/lib/mongodb';
+import User from '../src/models/User';
+import Course from '../src/models/Course'; 
+import Session from '../src/models/Session';
 
 export const dynamic = 'force-dynamic';
 

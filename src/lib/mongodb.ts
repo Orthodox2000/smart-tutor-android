@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import type { Db } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI || '';
 
@@ -37,4 +38,10 @@ async function connectToDatabase() {
   return cached.conn;
 }
 
+export { connectToDatabase };
 export default connectToDatabase;
+
+export async function getMongoDatabase(): Promise<Db> {
+  const mongooseConn = await connectToDatabase();
+  return mongooseConn.connection.db as Db;
+}

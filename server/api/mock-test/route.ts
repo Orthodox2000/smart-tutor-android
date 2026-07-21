@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectToDatabase from '../../../lib/mongodb';
-import Test from '../../../models/Test';
-import TestResult from '../../../models/TestResult';
-import { getSessionUser } from '../../../lib/api-helpers';
+import connectToDatabase from '../src/lib/mongodb';
+import Test from '../src/models/Test';
+import TestResult from '../src/models/TestResult';
+import { getSessionUser } from '../src/lib/api-helpers';
 
 export const dynamic = 'force-dynamic';
 

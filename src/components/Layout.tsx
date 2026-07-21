@@ -50,9 +50,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: t('common.dashboard'), path: '/', roles: ['student', 'educator', 'admin', 'parent'] },
-    { icon: BookOpen, label: t('common.courses'), path: '/courses', roles: ['student', 'educator', 'admin', 'parent'] },
-    { icon: Library, label: 'Digital Library', path: '/digital-library', roles: ['student', 'educator', 'admin', 'parent'] },
-    { icon: PenTool, label: 'Tests & Assignments', path: '/mock-test', roles: ['student', 'educator', 'admin', 'parent'] },
+    { icon: Library, label: 'Library', path: '/digital-library', roles: ['student', 'educator', 'admin', 'parent'] },
+    { icon: MessageSquare, label: 'Chat', path: '#chat', roles: ['student', 'educator', 'admin', 'parent'], isAction: true },
+    { icon: PenTool, label: 'Tests', path: '/mock-test', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: Trophy, label: 'Quiz Arena', path: '/quiz-arena', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: Calendar, label: 'Lectures', path: '/lectures', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: ClipboardCheck, label: 'Attendance', path: '/attendance', roles: ['student', 'educator', 'admin', 'parent'] },
@@ -66,7 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { icon: Users, label: 'Management', path: '/students', roles: ['admin', 'educator'] },
     { icon: Star, label: 'Student Feedback', path: '/feedback', roles: ['educator'] },
     { icon: ContactIcon, label: 'Contact Us', path: '/contact', roles: ['student', 'educator', 'admin', 'parent'] },
-    { icon: MessageSquare, label: 'AI Chat', path: '#chat', roles: ['student', 'educator', 'admin', 'parent'], isAction: true },
+    { icon: BookOpen, label: 'Courses', path: '/courses', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: Settings, label: 'Settings', path: '/settings', roles: ['student', 'educator', 'admin', 'parent'] },
   ];
 
@@ -97,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center h-[100dvh] h-screen bg-slate-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-academy-orange-600"></div>
       </div>
     );
@@ -110,8 +110,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     .slice(0, 5);
 
   return (
-    <div className="flex justify-center bg-slate-200 min-h-screen">
-      <div className="w-full max-w-[430px] bg-slate-50 h-[100dvh] flex flex-col relative overflow-hidden shadow-2xl">
+    <div className="flex justify-center bg-slate-200 h-[100dvh] h-screen">
+      <div className="w-full max-w-[430px] bg-slate-50 h-full flex flex-col relative overflow-hidden shadow-2xl" style={{ height: '100%' }}>
         
         <header className="h-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 sticky top-0 z-30 px-4 flex items-center justify-between pt-[env(safe-area-inset-top)]">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">

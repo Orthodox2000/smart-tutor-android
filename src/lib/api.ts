@@ -1,4 +1,4 @@
-const API_BASE = 'https://smart-tutor-android.vercel.app/api';
+const API_BASE = '/api';
 
 export async function apiFetch<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;

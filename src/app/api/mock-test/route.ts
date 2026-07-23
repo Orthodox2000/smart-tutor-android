@@ -4,8 +4,6 @@ import Test from '@/models/Test';
 import TestResult from '@/models/TestResult';
 import { getSessionUser } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 export async function POST(request: Request) {
   const session = getSessionUser(request);
   if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });

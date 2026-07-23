@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 function getText(value: unknown, maxLength = 300) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
 }

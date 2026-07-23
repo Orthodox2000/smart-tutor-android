@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
 import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, MessageSquare, Megaphone, Trash2, ShieldAlert, Clock, X } from 'lucide-react';
@@ -83,14 +84,8 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-6 pb-20">
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1">
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Communication Hub</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Messages & Notices</h1>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title="Messages & Notices" subtitle="Communication Hub" gradient="green" showBack />
 
       {(profile?.role === 'admin' || profile?.role === 'educator') && (
         <form onSubmit={handleSendMessage} className="bg-white p-6 rounded-2xl space-y-4 shadow-sm border border-slate-100">
@@ -218,7 +213,7 @@ export default function MessagesPage() {
                     <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
 
                     <div className="flex items-center gap-3 mt-2">
-                      <span className="text-[9px] font-bold text-slate-400">{msg.author}</span>
+                      <span className="text-[9px] font-bold text-slate-400">{(msg.author || '').split(' ')[0] || msg.author}</span>
                       <span className="text-[9px] text-slate-300">
                         {msg.createdAt ? new Date(msg.createdAt).toLocaleDateString() : ''}
                       </span>
@@ -242,6 +237,6 @@ export default function MessagesPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

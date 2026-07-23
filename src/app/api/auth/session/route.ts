@@ -4,8 +4,6 @@ import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 export async function GET() {
@@ -57,6 +55,10 @@ export async function GET() {
         enrolledCourse: user.enrolledCourse,
         batchNumber: user.batchNumber,
         createdAt: user.createdAt,
+        assignedFacultyIds: user.assignedFacultyIds || null,
+        linkedStudentId: user.linkedStudentId || null,
+        linkedStudentMobile: user.linkedStudentMobile || null,
+        parentMobile: user.parentMobile || null,
       }
     });
   } catch (error: any) {

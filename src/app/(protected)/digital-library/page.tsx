@@ -17,25 +17,30 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
 
-const API_BASE = 'https://smart-tutor-android.vercel.app/api';
+const PARENT_API = 'https://smarttutors.co.in/api';
 
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: Library },
-  { id: 'Textbook', label: 'Textbooks', icon: BookOpen },
-  { id: 'Faculty Note', label: 'Faculty Notes', icon: FileText },
-  { id: 'Mock Paper', label: 'Mock Papers', icon: GraduationCap },
-  { id: 'Reference', label: 'Reference', icon: Lightbulb },
-  { id: 'Other', label: 'Other', icon: Folder },
+  { id: 'school-learning', label: 'School', icon: BookOpen },
+  { id: 'competitive-exam', label: 'Competitive', icon: GraduationCap },
+  { id: 'technology-ai', label: 'Tech & AI', icon: Lightbulb },
+  { id: 'personality-development', label: 'Personality', icon: FileText },
+  { id: 'biography', label: 'Biography', icon: Folder },
+  { id: 'non-fiction', label: 'Non-Fiction', icon: Folder },
+  { id: 'government-exam', label: 'Govt Exams', icon: GraduationCap },
 ];
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
-  Textbook: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', gradient: 'from-blue-400 to-blue-600' },
-  'Faculty Note': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', gradient: 'from-emerald-400 to-emerald-600' },
-  'Mock Paper': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200', gradient: 'from-violet-400 to-violet-600' },
-  Reference: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', gradient: 'from-amber-400 to-amber-600' },
-  Other: { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200', gradient: 'from-slate-400 to-slate-500' },
+  'school-learning': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', gradient: 'from-blue-400 to-blue-600' },
+  'competitive-exam': { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200', gradient: 'from-violet-400 to-violet-600' },
+  'technology-ai': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', gradient: 'from-emerald-400 to-emerald-600' },
+  'personality-development': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', gradient: 'from-amber-400 to-amber-600' },
+  'biography': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', gradient: 'from-rose-400 to-rose-600' },
+  'non-fiction': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200', gradient: 'from-cyan-400 to-cyan-600' },
+  'government-exam': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', gradient: 'from-orange-400 to-orange-600' },
 };
 
 export default function DigitalLibraryPage() {
@@ -52,9 +57,22 @@ export default function DigitalLibraryPage() {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch<any>('/digital-library');
-      setItems(Array.isArray(data) ? data : data.books || data.items || []);
-    } catch {
+      const res = await fetch(`${PARENT_API}/digital-library`);
+      const data = await res.json();
+      const rawBooks = data?.books || data || [];
+      const normalized = (Array.isArray(rawBooks) ? rawBooks : []).map((b: any) => ({
+        ...b,
+        author: b.author || 'Smart Tutors',
+        category: b.categoryId || 'school-learning',
+        categoryLabel: b.categoryLabel || b.categoryId || 'Other',
+        thumbnailUrl: b.thumbnailUrl || null,
+        megaFileUrl: b.downloadUrl ? `${PARENT_API}${b.downloadUrl}` : null,
+        pathname: b.pathname || null,
+        price: b.price || null,
+      }));
+      setItems(normalized);
+    } catch (e) {
+      console.error('Failed to fetch library:', e);
     } finally {
       setLoading(false);
     }
@@ -69,14 +87,14 @@ export default function DigitalLibraryPage() {
         item.author?.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q);
       const matchesFilter =
-        filter === 'all' || item.category === filter || item.categoryLabel === filter;
+        filter === 'all' || item.category === filter || item.categoryId === filter || item.categoryLabel === filter;
       return matchesSearch && matchesFilter;
     });
   }, [items, search, filter]);
 
   const categoryCounts = useMemo(() => {
     return items.reduce((acc: Record<string, number>, item: any) => {
-      const cat = item.category || 'Other';
+      const cat = item.categoryId || item.category || 'school-learning';
       acc[cat] = (acc[cat] || 0) + 1;
       return acc;
     }, {});
@@ -84,7 +102,7 @@ export default function DigitalLibraryPage() {
 
   const handlePreview = (item: any) => {
     if (item.pathname) {
-      window.open(`${API_BASE}/digital-library/preview?pathname=${item.pathname}`, '_blank');
+      window.open(`${PARENT_API}/digital-library/preview?pathname=${item.pathname}`, '_blank');
     } else {
       alert('Preview not available');
     }
@@ -101,32 +119,22 @@ export default function DigitalLibraryPage() {
   };
 
   return (
-    <div className="space-y-5 pb-20">
-      {/* Header */}
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1">
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">
-            Resource Center
-          </p>
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Digital Library</h1>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
-                {items.length} {items.length === 1 ? 'book' : 'books'}
-              </span>
-              {(profile?.role === 'admin' || profile?.role === 'educator') && (
-                <button className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
-                  <Plus size={18} />
-                </button>
-              )}
-            </div>
-          </div>
+    <PageContainer>
+      <PageHeader title="Digital Library" subtitle="Resource Center" gradient="blue" showBack>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-white/70 bg-white/15 px-2.5 py-1 rounded-lg border border-white/10">
+            {items.length} {items.length === 1 ? 'book' : 'books'}
+          </span>
+          {profile?.role === 'admin' && (
+            <button className="w-9 h-9 rounded-xl bg-white/15 text-white flex items-center justify-center shadow-lg border border-white/20 backdrop-blur-md">
+              <Plus size={18} />
+            </button>
+          )}
         </div>
-      </header>
+      </PageHeader>
 
       {/* Search */}
-      <div className="relative">
+      <div className="relative mb-3">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <input
           type="text"
@@ -259,10 +267,10 @@ export default function DigitalLibraryPage() {
                   </button>
                   <button
                     onClick={() => handleDownload(item)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-900 text-white text-[10px] font-bold rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98]"
+                    className="w-10 flex items-center justify-center py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98]"
+                    title="Download"
                   >
-                    <Download size={12} />
-                    Download
+                    <Download size={14} />
                   </button>
                 </div>
               </motion.div>
@@ -278,6 +286,6 @@ export default function DigitalLibraryPage() {
           </p>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

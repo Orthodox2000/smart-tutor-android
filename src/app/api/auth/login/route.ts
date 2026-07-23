@@ -4,8 +4,6 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-export const dynamic = 'force-dynamic';
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 async function ensureDemoUsers() {
@@ -98,6 +96,10 @@ export async function POST(request: Request) {
         educationLevel: user.educationLevel,
         batchNumber: user.batchNumber,
         createdAt: user.createdAt,
+        assignedFacultyIds: user.assignedFacultyIds || null,
+        linkedStudentId: user.linkedStudentId || null,
+        linkedStudentMobile: user.linkedStudentMobile || null,
+        parentMobile: user.parentMobile || null,
       }
     });
 

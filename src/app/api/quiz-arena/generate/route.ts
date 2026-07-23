@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCollection, normalizeDoc } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 const FALLBACK_QUESTIONS: Record<string, Array<{ question: string; options: string[]; correctAnswer: number; explanation: string; category: string }>> = {
   mathematics: [
     { question: 'What is 15 × 13?', options: ['185', '195', '205', '175'], correctAnswer: 1, explanation: '15 × 13 = 195', category: 'arithmetic' },

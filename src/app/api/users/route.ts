@@ -3,8 +3,6 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   try {
     const session = getSessionUser(request);

@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { Shield } from 'lucide-react';
-import PageBackButton from '../../../components/PageBackButton';
+import PageBackButton from '../../components/PageBackButton';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="max-w-xl mx-auto space-y-6 pb-20 animate-fade-in">
+    <div className="max-w-xl mx-auto space-y-6 pb-20 pt-4 px-4 animate-fade-in">
       <header className="flex items-center gap-2">
         <PageBackButton />
         <div className="flex-1">

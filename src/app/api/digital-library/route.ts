@@ -3,8 +3,6 @@ import connectToDatabase from '@/lib/mongodb';
 import LibraryItem from '@/models/LibraryItem';
 import { getSessionUser } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

@@ -7,8 +7,6 @@ import mongoose from 'mongoose';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
-export const dynamic = 'force-dynamic';
-
 function getSessionUser(request: Request) {
   try {
     const cookieHeader = request.headers.get('cookie') || '';
@@ -70,7 +68,10 @@ async function getAllowedReceiverIds(session: { id: string; role: string; uid?: 
       .map((p: any) => p.id || p.uid)
       .filter(Boolean);
 
-    return [...new Set([...teacherIds, ...parentIds])];
+    const admins = await User.find({ role: 'admin' }).select('id uid').lean();
+    const adminIds = admins.map((a: any) => a.id || a.uid).filter(Boolean);
+
+    return [...new Set([...teacherIds, ...parentIds, ...adminIds])];
   }
 
   if (session.role === 'educator' || session.role === 'teacher') {

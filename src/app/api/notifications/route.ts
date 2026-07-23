@@ -3,8 +3,6 @@ import connectToDatabase from '@/lib/mongodb';
 import Notification from '@/models/Notification';
 import jwt from 'jsonwebtoken';
 
-export const dynamic = 'force-dynamic';
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 function getSessionUser(request: Request) {

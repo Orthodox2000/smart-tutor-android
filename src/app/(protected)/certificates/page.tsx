@@ -5,7 +5,8 @@ import { motion } from 'motion/react';
 import { Award, Download, Plus, X, Trash2 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
 
 const TEMPLATES = [
   { id: 'classic-gold', name: 'Classic Gold', color: 'from-amber-100 to-yellow-50', border: 'border-amber-300' },
@@ -78,24 +79,17 @@ export default function CertificatesPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Achievements</p>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Certificates</h1>
-          </div>
-          {profile?.role === 'admin' && (
-            <button 
-              onClick={() => setShowIssue(!showIssue)}
-              className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg"
-            >
-              {showIssue ? <X size={24} /> : <Plus size={24} />}
-            </button>
-          )}
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title="Certificates" subtitle="Achievements" gradient="amber" showBack />
+
+      {profile?.role === 'admin' && (
+        <button 
+          onClick={() => setShowIssue(!showIssue)}
+          className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg ml-auto"
+        >
+          {showIssue ? <X size={24} /> : <Plus size={24} />}
+        </button>
+      )}
 
       {showIssue && profile?.role === 'admin' && (
         <motion.div 
@@ -183,6 +177,6 @@ export default function CertificatesPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

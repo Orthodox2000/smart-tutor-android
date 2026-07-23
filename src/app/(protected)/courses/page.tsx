@@ -1,47 +1,23 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { apiFetch } from '../../../lib/api';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, User, DollarSign, Plus, Search, Filter } from 'lucide-react';
+import { BookOpen, Plus, Search, Filter } from 'lucide-react';
 import PageBackButton from '../../../components/PageBackButton';
+import { COURSES_CATALOG } from '../../../lib/courses-data';
 
 export default function CoursesPage() {
   const { profile } = useAuth();
-  const [courses, setCourses] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const data = await apiFetch('/courses');
-      const normalized = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.courses)
-        ? data.courses
-        : Array.isArray(data?.items)
-        ? data.items
-        : [];
-      setCourses(normalized);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredCourses = courses.filter(c => {
+  const filteredCourses = COURSES_CATALOG.filter(c => {
     const q = searchTerm.toLowerCase();
     return (
       c.title?.toLowerCase().includes(q) ||
-      c.name?.toLowerCase().includes(q) ||
-      c.subject?.toLowerCase().includes(q) ||
-      c.category?.toLowerCase().includes(q)
+      c.category?.toLowerCase().includes(q) ||
+      c.summary?.toLowerCase().includes(q) ||
+      c.tagline?.toLowerCase().includes(q)
     );
   });
 
@@ -84,22 +60,15 @@ export default function CoursesPage() {
         </button>
       </div>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 opacity-40">
-           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-400 mb-4"></div>
-           <p className="text-xs font-bold uppercase tracking-widest">Finding Courses...</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          <AnimatePresence mode="popLayout">
-            {filteredCourses.map((course, i) => (
-              <CourseCard key={course._id} course={course} index={i} />
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
-      
-      {!loading && filteredCourses.length === 0 && (
+      <div className="grid grid-cols-2 gap-4">
+        <AnimatePresence mode="popLayout">
+          {filteredCourses.map((course, i) => (
+            <CourseCard key={course.id} course={course} index={i} />
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {filteredCourses.length === 0 && (
          <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 border-dashed">
             <BookOpen className="mx-auto text-slate-200 mb-4" size={48} />
             <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No matching courses found</p>
@@ -117,28 +86,27 @@ function CourseCard({ course, index }: { course: any; index: number }) {
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ delay: index * 0.05 }}
       onClick={() => setIsExpanded(!isExpanded)}
       className={`bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-all cursor-pointer group flex flex-col ${isExpanded ? 'col-span-2' : 'h-full'}`}
     >
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          {(course.subject || course.category) && (
-            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-slate-100 text-slate-600 rounded-lg">
-              {course.subject || course.category || 'General'}
-            </span>
-          )}
-          {course.batchNumber && (
+          <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-slate-100 text-slate-600 rounded-lg">
+            {course.category}
+          </span>
+          {course.stream && course.stream !== 'General' && (
             <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-orange-50 text-orange-600 rounded-lg">
-              Batch {course.batchNumber}
+              {course.stream}
             </span>
           )}
         </div>
-        <h3 className="font-bold text-slate-900 leading-tight mb-2 group-hover:text-slate-900 transition-colors">
-          {course.title || course.name}
+        <h3 className="font-bold text-slate-900 leading-tight mb-1 group-hover:text-slate-900 transition-colors">
+          {course.title}
         </h3>
+        <p className="text-[10px] font-bold text-orange-500 mb-2">{course.tagline}</p>
         <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">
-          {course.summary || course.description}
+          {course.summary}
         </p>
 
         <AnimatePresence>
@@ -154,18 +122,29 @@ function CourseCard({ course, index }: { course: any; index: number }) {
                 <p className="text-xs text-slate-600 leading-relaxed">{course.description}</p>
               </div>
 
-              {course.subjectsCovered && (
+              {course.courseNamesIncluded?.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Subjects Covered</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Courses Included</p>
                   <div className="flex flex-wrap gap-2">
-                    {course.subjectsCovered.map((s: string) => (
+                    {course.courseNamesIncluded.map((s: string) => (
                       <span key={s} className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-[10px] font-bold">{s}</span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {course.points && (
+              {course.subjectsCovered?.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Subjects Covered</p>
+                  <div className="flex flex-wrap gap-2">
+                    {course.subjectsCovered.map((s: string) => (
+                      <span key={s} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {course.points?.length > 0 && (
                 <div>
                   <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2">Key Highlights</p>
                   <ul className="space-y-2">
@@ -181,18 +160,12 @@ function CourseCard({ course, index }: { course: any; index: number }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Duration</p>
-                  <p className="text-xs font-bold text-slate-700">{course.duration || 'Flexible'}</p>
+                  <p className="text-xs font-bold text-slate-700">{course.duration}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Price</p>
-                  <p className="text-xs font-bold text-slate-700">{course.price != null && course.price !== 0 ? `$${course.price}` : 'Free'}</p>
+                  <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Mode</p>
+                  <p className="text-xs font-bold text-slate-700">{course.mode}</p>
                 </div>
-                {course.educatorName && (
-                  <div className="col-span-2">
-                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Educator</p>
-                    <p className="text-xs font-bold text-slate-700">{course.educatorName}</p>
-                  </div>
-                )}
               </div>
             </motion.div>
           )}
@@ -203,10 +176,10 @@ function CourseCard({ course, index }: { course: any; index: number }) {
         <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
            <div className="flex items-center gap-1.5 text-slate-400">
               <BookOpen size={14} />
-              <span className="text-[10px] font-bold uppercase tracking-wider">Tap to Expand</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">{course.duration}</span>
            </div>
-           <span className="text-xs font-black text-slate-900">
-             {course.price != null && course.price !== 0 ? `$${course.price}` : 'Free'}
+           <span className="text-[10px] font-black text-orange-500 uppercase tracking-wider">
+             {course.statusLabel}
            </span>
         </div>
       )}

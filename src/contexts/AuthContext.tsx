@@ -25,6 +25,10 @@ export interface UserProfile {
   batchNumber?: string;
   program?: string;
   createdAt: string;
+  assignedFacultyIds?: string[];
+  linkedStudentId?: string;
+  linkedStudentMobile?: string;
+  parentMobile?: string;
 }
 
 interface AuthContextType {

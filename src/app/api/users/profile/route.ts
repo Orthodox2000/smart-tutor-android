@@ -4,8 +4,6 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { getSessionUser } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   const session = getSessionUser(request);
   if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });

@@ -3,8 +3,6 @@ import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
 import crypto from 'crypto';
 import { ObjectId } from 'mongodb';
 
-export const dynamic = 'force-dynamic';
-
 async function findDoc(col: any, idParam: string) {
   let doc = await col.findOne({ id: idParam });
   if (!doc && ObjectId.isValid(idParam)) {

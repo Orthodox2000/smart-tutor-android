@@ -8,7 +8,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
+import StatCard from '../../../components/StatCard';
 
 type PaymentTransaction = {
   paidAmount: number;
@@ -370,65 +372,59 @@ export default function FeesPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Financial Overview</p>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Fees & Invoices</h1>
-            </div>
-            {profile?.role === 'admin' && (
-              <button
-                onClick={() => setShowCreate(true)}
-                className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
-              >
-                <Plus size={24} />
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title="Fees & Invoices" subtitle="Financial Overview" gradient="amber" showBack />
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 min-w-0">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-              <Coins size={16} className="text-blue-500" />
+      <div className="flex items-center justify-end mb-4">
+        {profile?.role === 'admin' && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-academy-orange-100"
+          >
+            <Plus size={24} />
+          </button>
+        )}
+      </div>
+
+      {/* Total Fees - full width */}
+      <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm mb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+            <Coins size={22} className="text-blue-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Fees</p>
+            <p className="text-2xl font-black text-slate-800">{formatCurrency(totalFees)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Paid + Due side by side */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+              <CheckCircle size={18} className="text-emerald-500" />
             </div>
             <div className="min-w-0">
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Total</p>
-              <p className="text-sm font-black text-slate-800 truncate">{formatCurrency(totalFees)}</p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Paid</p>
+              <p className="text-base font-black text-emerald-600 truncate">{formatCurrency(totalPaid)}</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 min-w-0">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-              <CheckCircle size={16} className="text-emerald-500" />
+        <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+              <AlertCircle size={18} className="text-red-500" />
             </div>
             <div className="min-w-0">
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Paid</p>
-              <p className="text-sm font-black text-emerald-600 truncate">{formatCurrency(totalPaid)}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl border border-slate-100 p-4 min-w-0">
-          <div className="flex items-center gap-2">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${totalDue > 0 ? 'bg-red-50' : 'bg-emerald-50'}`}>
-              <AlertCircle size={16} className={totalDue > 0 ? 'text-red-500' : 'text-emerald-500'} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Due</p>
-              <p className={`text-sm font-black truncate ${totalDue > 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatCurrency(totalDue)}</p>
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Due</p>
+              <p className="text-base font-black text-red-600 truncate">{formatCurrency(totalDue)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Create Invoice Modal */}
       <AnimatePresence>
         {showCreate && (
           <motion.div
@@ -484,8 +480,7 @@ export default function FeesPage() {
         )}
       </AnimatePresence>
 
-      {/* Invoice List */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {loading ? (
           <div className="text-center py-20 opacity-40">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-400 mx-auto" />
@@ -504,11 +499,12 @@ export default function FeesPage() {
                 transition={{ delay: i * 0.05 }}
                 className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden"
               >
+                {/* Header row: icon + title + download + chevron */}
                 <div
-                  className="p-4 flex items-start gap-3 cursor-pointer"
+                  className="p-4 flex items-center gap-3 cursor-pointer"
                   onClick={() => setExpandedId(isExpanded ? null : invoice.id)}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
                     <ReceiptText size={16} className="text-slate-400" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -516,20 +512,46 @@ export default function FeesPage() {
                     <p className="text-[10px] text-slate-400 font-bold mt-0.5 truncate">
                       {invoice.receiptNo ? invoice.receiptNo : formatReceiptDate(invoice.dueDate)}
                     </p>
-                    <div className="flex items-center gap-1 mt-1">
-                      {getStatusIcon(invoice.status)}
-                      <span className={`text-[9px] font-black uppercase tracking-wider ${statusColor(invoice.status)}`}>
-                        {statusLabel(invoice.status)}
-                      </span>
-                    </div>
                   </div>
-                  <div className="text-right shrink-0 pl-2">
-                    <p className="font-black text-slate-900 text-sm whitespace-nowrap">{formatCurrency(invoice.amount)}</p>
-                  </div>
+                  {(invoice.status === 'paid' || invoice.status === 'partial') && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); downloadInvoiceReceipt(invoice); }}
+                      className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 active:scale-95 transition-transform"
+                      title="Download Receipt"
+                    >
+                      <Download size={15} />
+                    </button>
+                  )}
                   <div className="text-slate-300 shrink-0">
                     {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   </div>
                 </div>
+
+                {/* Amount / Paid / Balance - flex column */}
+                <div className="px-4 pb-5 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Amount</span>
+                    <span className="font-black text-slate-900 text-sm">{formatCurrency(invoice.amount)}</span>
+                  </div>
+                  <div className="h-px bg-slate-100" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paid</span>
+                    <span className="font-black text-emerald-600 text-sm">{formatCurrency(paidAmt)}</span>
+                  </div>
+                  <div className="h-px bg-slate-100" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Balance</span>
+                    <span className={`font-black text-sm ${bal > 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatCurrency(bal)}</span>
+                  </div>
+                  <div className="flex items-center gap-1 mt-2">
+                    {getStatusIcon(invoice.status)}
+                    <span className={`text-[9px] font-black uppercase tracking-wider ${statusColor(invoice.status)}`}>
+                      {statusLabel(invoice.status)}
+                    </span>
+                  </div>
+                </div>
+
+                {isExpanded && <div className="h-5 bg-slate-50" />}
 
                 <AnimatePresence>
                   {isExpanded && (
@@ -539,33 +561,45 @@ export default function FeesPage() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-4 border-t border-slate-50">
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3 text-[11px]">
+                      <div className="px-4 pb-5 flex flex-col gap-3">
+                        <div className="flex flex-col gap-2.5 text-[11px]">
                           {invoice.receiptNo && (
-                            <div className="min-w-0"><span className="text-slate-400 font-bold">Receipt: </span><span className="text-slate-700 break-all">{invoice.receiptNo}</span></div>
+                            <div className="flex items-start justify-between">
+                              <span className="text-slate-400 font-bold">Receipt</span>
+                              <span className="text-slate-700 break-all text-right max-w-[60%]">{invoice.receiptNo}</span>
+                            </div>
                           )}
-                          <div><span className="text-slate-400 font-bold">Due: </span><span className="text-slate-700">{formatReceiptDate(invoice.dueDate)}</span></div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-400 font-bold">Due Date</span>
+                            <span className="text-slate-700">{formatReceiptDate(invoice.dueDate)}</span>
+                          </div>
                           {invoice.studentName && (
-                            <div className="min-w-0"><span className="text-slate-400 font-bold">Student: </span><span className="text-slate-700 truncate inline-block max-w-[140px] align-bottom">{invoice.studentName}</span></div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400 font-bold">Student</span>
+                              <span className="text-slate-700 truncate max-w-[60%] text-right">{invoice.studentName}</span>
+                            </div>
                           )}
-                          <div><span className="text-slate-400 font-bold">Paid: </span><span className="text-emerald-600 font-bold whitespace-nowrap">{formatCurrency(paidAmt)}</span></div>
                           {invoice.month && (
-                            <div><span className="text-slate-400 font-bold">Month: </span><span className="text-slate-700">{invoice.month}</span></div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400 font-bold">Month</span>
+                              <span className="text-slate-700">{invoice.month}</span>
+                            </div>
                           )}
-                          <div><span className="text-slate-400 font-bold">Balance: </span><span className={`font-bold whitespace-nowrap ${bal > 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatCurrency(bal)}</span></div>
                           {invoice.particulars && (
-                            <div className="col-span-2 min-w-0"><span className="text-slate-400 font-bold">Particulars: </span><span className="text-slate-700 break-words">{invoice.particulars}</span></div>
+                            <div className="flex items-start justify-between">
+                              <span className="text-slate-400 font-bold">Particulars</span>
+                              <span className="text-slate-700 break-words text-right max-w-[65%]">{invoice.particulars}</span>
+                            </div>
                           )}
                         </div>
 
-                        {/* Payment History */}
                         {invoice.transactions && invoice.transactions.length > 0 && (
                           <div className="mt-3">
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Payment History</p>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1">
+                            <div className="flex flex-col gap-1.5">
                               {invoice.transactions.map((t, ti) => (
                                 <span key={ti} className="inline-flex items-center gap-1 text-[11px] text-slate-600">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                                   {formatCurrency(t.paidAmount)} via {t.paymentMode} on {formatReceiptDate(t.paidDate)}
                                 </span>
                               ))}
@@ -573,7 +607,6 @@ export default function FeesPage() {
                           </div>
                         )}
 
-                        {/* Receipt Button */}
                         {(invoice.status === 'paid' || invoice.status === 'partial') && (
                           <button
                             onClick={(e) => { e.stopPropagation(); downloadInvoiceReceipt(invoice); }}
@@ -597,6 +630,6 @@ export default function FeesPage() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -42,7 +42,7 @@ export default function ContactPage() {
   const router = useRouter();
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="max-w-xl mx-auto space-y-8 pb-10 pt-4 px-4">
       <header className="flex items-center gap-4">
         <button
           onClick={() => router.back()}

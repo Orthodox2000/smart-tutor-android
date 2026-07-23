@@ -5,7 +5,9 @@ import { motion } from 'motion/react';
 import { ClipboardCheck, CheckCircle, XCircle, Clock, Calendar } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
+import StatCard from '../../../components/StatCard';
 
 export default function AttendancePage() {
   const { profile } = useAuth();
@@ -60,47 +62,28 @@ export default function AttendancePage() {
   const percentage = stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0;
 
   return (
-    <div className="space-y-6 pb-20">
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1">
-          <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Track Progress</p>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Attendance</h1>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title="Attendance" subtitle="Track Progress" gradient="green" showBack />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-3">
-        {[
-          { label: 'Present', value: stats.present, color: 'bg-emerald-50 text-emerald-600', icon: CheckCircle },
-          { label: 'Absent', value: stats.absent, color: 'bg-red-50 text-red-600', icon: XCircle },
-          { label: 'Late', value: stats.late, color: 'bg-amber-50 text-amber-600', icon: Clock },
-          { label: 'Rate', value: `${percentage}%`, color: 'bg-orange-50 text-orange-600', icon: ClipboardCheck },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className={`p-4 rounded-2xl text-center ${stat.color}`}
-          >
-            <stat.icon size={20} className="mx-auto mb-1" />
-            <p className="text-lg font-black">{stat.value}</p>
-            <p className="text-[8px] font-bold uppercase tracking-widest opacity-60">{stat.label}</p>
-          </motion.div>
-        ))}
+      <div className="grid grid-cols-2 gap-3.5 mb-6">
+        <StatCard title="Present" value={stats.present} icon={CheckCircle} color="text-emerald-500" bg="bg-emerald-50" delay={0} />
+        <StatCard title="Absent" value={stats.absent} icon={XCircle} color="text-red-500" bg="bg-red-50" delay={0.05} />
+        <StatCard title="Late" value={stats.late} icon={Clock} color="text-amber-500" bg="bg-amber-50" delay={0.1} />
+        <StatCard title="Attendance Rate" value={`${percentage}%`} icon={ClipboardCheck} color="text-blue-500" bg="bg-blue-50" delay={0.15} />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center mb-6">
           <p className="text-xs font-bold text-red-600">{error}</p>
           <button onClick={fetchAttendance} className="mt-2 text-[10px] font-bold text-red-500 underline">Retry</button>
         </div>
       )}
 
       {/* Attendance Sheets */}
-      <div className="space-y-4">
+      <div className="space-y-3">
+        <h2 className="text-[15px] font-bold text-slate-800">Records</h2>
         {loading ? (
           <div className="text-center py-20 opacity-40">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-400 mx-auto" />
@@ -112,11 +95,12 @@ export default function AttendancePage() {
             return (
               <motion.div
                 key={sheet.id || sheet._id || i}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm"
+                transition={{ delay: i * 0.03 }}
+                className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm">{sheet.title || sheet.name || 'Attendance'}</h3>
                     <div className="flex items-center gap-2 mt-1">
@@ -125,7 +109,7 @@ export default function AttendancePage() {
                         {sheet.date ? new Date(sheet.date).toLocaleDateString() : 'No date'}
                       </span>
                       {(sheet.subject || sheet.class) && (
-                        <span className="text-[8px] font-bold uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">
+                        <span className="text-[8px] font-bold uppercase px-2 py-0.5 bg-indigo-50 text-indigo-500 rounded-md">
                           {sheet.subject || sheet.class}
                         </span>
                       )}
@@ -143,7 +127,7 @@ export default function AttendancePage() {
                   )}
                 </div>
                 {(record?.remarks || record?.teacherNote) && (
-                  <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl">{record.remarks || record.teacherNote}</p>
+                  <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl mt-2">{record.remarks || record.teacherNote}</p>
                 )}
               </motion.div>
             );
@@ -155,6 +139,6 @@ export default function AttendancePage() {
           </div>
         ) : null}
       </div>
-    </div>
+    </PageContainer>
   );
 }

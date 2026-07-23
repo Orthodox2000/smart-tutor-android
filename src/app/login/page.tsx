@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { User, Lock, ChevronRight, GraduationCap, Users, BookOpen, Eye, EyeOff } from 'lucide-react';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const LOGIN_ROLES = [
   { key: 'student', label: 'Student', icon: GraduationCap },
@@ -38,11 +39,7 @@ export default function LoginPage() {
   }, [profile, authLoading, router]);
 
   if (authLoading || profile) {
-    return (
-      <div className="flex items-center justify-center h-[100dvh] h-screen bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-academy-orange-600"></div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -149,10 +146,20 @@ export default function LoginPage() {
 
             <button 
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-academy-orange-600 py-4 shadow-lg shadow-academy-orange-100 rounded-2xl mt-4 font-bold text-[15px] text-white"
+              type="submit"
+              className="group relative block w-full cursor-pointer select-none overflow-hidden 
+                         bg-transparent px-[2.4em] py-[0.7em] text-[18px] font-medium text-orange-500 
+                         transition-colors duration-300 hover:text-white mt-4"
+              style={{ zIndex: 1 }}
             >
-              {loading ? 'Processing...' : 'Login Now'}
-              <ChevronRight size={20} />
+              <span className="relative z-10">{loading ? 'Processing...' : 'Login Now'}</span>
+              <span className="absolute inset-0 z-[-1] border-[2px] border-orange-500">
+                <span className="absolute left-1/2 top-1/2 block h-[3000px] w-[3%] 
+                       -translate-x-1/2 -translate-y-1/2 -rotate-[60deg] bg-white 
+                       transition-all duration-700 
+                       group-hover:w-full group-hover:-rotate-90 group-hover:bg-orange-500 
+                       group-active:bg-orange-600"></span>
+              </span>
             </button>
           </form>
 
@@ -165,7 +172,14 @@ export default function LoginPage() {
             </a>
           </div>
           
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
+             <div className="flex items-center justify-center gap-3 flex-wrap">
+               <a href="/privacy-policy" className="text-[10px] font-bold text-slate-400 hover:text-academy-orange-600 transition-colors">Privacy Policy</a>
+               <span className="text-slate-200">|</span>
+               <a href="/terms-and-conditions" className="text-[10px] font-bold text-slate-400 hover:text-academy-orange-600 transition-colors">Terms & Conditions</a>
+               <span className="text-slate-200">|</span>
+               <a href="/eula" className="text-[10px] font-bold text-slate-400 hover:text-academy-orange-600 transition-colors">EULA</a>
+             </div>
              <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
                Smart Tutors &bull; v3.0
              </p>

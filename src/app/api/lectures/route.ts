@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
 import crypto from 'crypto';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   const session = getSessionUser(request);
   if (!session) {

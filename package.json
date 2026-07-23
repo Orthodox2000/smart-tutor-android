@@ -11,7 +11,7 @@
     "test:stability": "node scripts/test-stability.cjs",
     "test:security": "node scripts/test-security.cjs",
     "test:all": "node scripts/test-stability.cjs && node scripts/test-security.cjs",
-    "cap:sync": "npx cap sync android",
+    "cap:sync": "set CAPACITOR_BUILD=true && set NEXT_PUBLIC_API_BASE=https://smart-tutor-android.vercel.app/api && npx next build && npx cap sync android",
     "cap:open": "npx cap open android",
     "build:apk": "build-apk.bat",
     "build:playstore": "build-playstore.bat",

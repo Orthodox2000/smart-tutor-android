@@ -5,8 +5,6 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
-export const dynamic = 'force-dynamic';
-
 function getSessionUser(request: Request) {
   try {
     const cookieHeader = request.headers.get('cookie') || '';
@@ -91,7 +89,7 @@ export async function POST(request: Request) {
       title,
       body: content,
       channel,
-      author: body.authorName || body.author || session.id,
+      author: body.authorName || body.author || 'Admin',
       audience,
       userIds,
       expiresAt,

@@ -5,7 +5,8 @@ import { motion } from 'motion/react';
 import { Calendar, Video, Plus, X, ExternalLink, Clock } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { apiFetch } from '../../../lib/api';
-import PageBackButton from '../../../components/PageBackButton';
+import PageContainer from '../../../components/PageContainer';
+import PageHeader from '../../../components/PageHeader';
 
 export default function LecturesPage() {
   const { profile } = useAuth();
@@ -52,26 +53,17 @@ export default function LecturesPage() {
   const past = lectures.filter(l => !l.timing || new Date(l.timing) < now);
 
   return (
-    <div className="space-y-6 pb-20">
-      <header className="flex items-center gap-2">
-        <PageBackButton />
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold text-academy-orange-600 uppercase tracking-widest mb-1">Class Schedule</p>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Lectures</h1>
-            </div>
-            {(profile?.role === 'admin' || profile?.role === 'educator') && (
-              <button 
-                onClick={() => setShowCreate(!showCreate)}
-                className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg"
-              >
-                {showCreate ? <X size={24} /> : <Plus size={24} />}
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+    <PageContainer>
+      <PageHeader title="Lectures" subtitle="Class Schedule" gradient="purple" showBack />
+
+      {(profile?.role === 'admin' || profile?.role === 'educator') && (
+        <button
+          onClick={() => setShowCreate(!showCreate)}
+          className="w-10 h-10 bg-academy-orange-600 text-white rounded-xl flex items-center justify-center shadow-lg ml-auto"
+        >
+          {showCreate ? <X size={24} /> : <Plus size={24} />}
+        </button>
+      )}
 
       {showCreate && (
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl border border-academy-orange-100 shadow-sm">
@@ -136,6 +128,6 @@ export default function LecturesPage() {
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No lectures scheduled</p>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -9,7 +9,7 @@ export interface IUser extends Document {
   name: string; // From new schema
   displayName?: string; // Keeping for compatibility
   photoURL?: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'educator' | 'admin' | 'parent';
   label?: string; // From new schema
   program?: string; // From new schema
   status?: string; // From new schema
@@ -33,7 +33,7 @@ const UserSchema: Schema = new Schema({
   name: { type: String },
   displayName: { type: String },
   photoURL: { type: String },
-  role: { type: String, enum: ['student', 'teacher', 'admin'], default: 'student' },
+  role: { type: String, enum: ['student', 'teacher', 'educator', 'admin', 'parent'], default: 'student' },
   label: { type: String },
   program: { type: String },
   status: { type: String, default: 'active' },

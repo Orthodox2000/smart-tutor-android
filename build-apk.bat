@@ -27,11 +27,16 @@ echo TypeScript check complete.
 
 echo.
 echo [4/7] Building Next.js for production (static export)...
+set CAPACITOR_BUILD=true
+set NEXT_PUBLIC_API_BASE=https://smart-tutor-android.vercel.app/api
+if exist "src\app\api" ren "src\app\api" "_api_backup"
 call npx next build
 if %errorlevel% neq 0 (
+    if exist "src\app\_api_backup" ren "src\app\_api_backup" "api"
     echo ERROR: Next.js build failed
     exit /b 1
 )
+if exist "src\app\_api_backup" ren "src\app\_api_backup" "api"
 
 echo.
 echo [5/7] Syncing web assets to Android...

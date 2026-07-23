@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const systemPrompt = `You are SmartTutor AI — the official AI education assistant built by Smart Tutors (smarttutors.co.in). You are warm, knowledgeable, and genuinely helpful.

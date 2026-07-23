@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: Request) {
   const session = getSessionUser(request);
   if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });

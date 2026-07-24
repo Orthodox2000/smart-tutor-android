@@ -56,17 +56,18 @@ async function getAllowedReceiverIds(session: { id: string; role: string; uid?: 
   if (!me) return [];
 
   if (session.role === 'student') {
-    const batchMates = await User.find({
-      batchNumber: me.batchNumber,
-      $or: [{ role: 'teacher' }, { role: 'educator' }],
-    }).select('id uid').lean();
-    const teacherIds = batchMates.map((u: any) => u.id || u.uid).filter(Boolean);
+    const myId = me.id || me.uid;
 
-    const parents = await User.find({ role: 'parent' }).select('id uid batchNumber').lean();
-    const parentIds = parents
-      .filter((p: any) => !p.batchNumber || p.batchNumber === me.batchNumber)
-      .map((p: any) => p.id || p.uid)
-      .filter(Boolean);
+    const assignedFacultyIds = me.assignedFacultyIds || [];
+    const facultyUsers = assignedFacultyIds.length > 0
+      ? await User.find({ $or: [{ id: { $in: assignedFacultyIds } }, { uid: { $in: assignedFacultyIds } }] }).select('id uid').lean()
+      : [];
+    const teacherIds = facultyUsers.map((u: any) => u.id || u.uid).filter(Boolean);
+
+    const parents = await User.find({
+      $or: [{ linkedStudentId: myId }, { linkedStudentId: me.uid }],
+    }).select('id uid').lean();
+    const parentIds = parents.map((p: any) => p.id || p.uid).filter(Boolean);
 
     const admins = await User.find({ role: 'admin' }).select('id uid').lean();
     const adminIds = admins.map((a: any) => a.id || a.uid).filter(Boolean);
@@ -75,9 +76,10 @@ async function getAllowedReceiverIds(session: { id: string; role: string; uid?: 
   }
 
   if (session.role === 'educator' || session.role === 'teacher') {
+    const myId = me.id || me.uid;
+
     const students = await User.find({
-      batchNumber: me.batchNumber,
-      $or: [{ role: 'student' }, { role: 'parent' }],
+      assignedFacultyIds: { $in: [myId, me.uid].filter(Boolean) },
     }).select('id uid').lean();
     const studentIds = students.map((u: any) => u.id || u.uid).filter(Boolean);
 
@@ -88,19 +90,20 @@ async function getAllowedReceiverIds(session: { id: string; role: string; uid?: 
   }
 
   if (session.role === 'parent') {
-    const children = await User.find({
-      role: 'student',
-      batchNumber: me.batchNumber,
-    }).select('id uid batchNumber').lean();
+    const myId = me.id || me.uid;
 
-    const childBatches = [...new Set(children.map((c: any) => c.batchNumber).filter(Boolean))];
-    const teachers = await User.find({
-      batchNumber: { $in: childBatches },
-      $or: [{ role: 'teacher' }, { role: 'educator' }],
-    }).select('id uid').lean();
+    const linkedStudent = await User.findOne({
+      $or: [{ linkedStudentId: myId }, { linkedStudentId: me.uid }],
+    }).select('id uid assignedFacultyIds').lean() as any;
 
-    const childIds = children.map((c: any) => c.id || c.uid).filter(Boolean);
-    const teacherIds = teachers.map((t: any) => t.id || t.uid).filter(Boolean);
+    const childIds = linkedStudent ? [linkedStudent.id || linkedStudent.uid].filter(Boolean) : [];
+
+    const assignedFacultyIds = linkedStudent?.assignedFacultyIds || [];
+    const facultyUsers = assignedFacultyIds.length > 0
+      ? await User.find({ $or: [{ id: { $in: assignedFacultyIds } }, { uid: { $in: assignedFacultyIds } }] }).select('id uid').lean()
+      : [];
+    const teacherIds = facultyUsers.map((t: any) => t.id || t.uid).filter(Boolean);
+
     const admins = await User.find({ role: 'admin' }).select('id uid').lean();
     const adminIds = admins.map((a: any) => a.id || a.uid).filter(Boolean);
 

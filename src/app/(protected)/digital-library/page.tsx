@@ -41,7 +41,10 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
   'biography': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', gradient: 'from-rose-400 to-rose-600' },
   'non-fiction': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200', gradient: 'from-cyan-400 to-cyan-600' },
   'government-exam': { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', gradient: 'from-orange-400 to-orange-600' },
+  'Other': { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', gradient: 'from-slate-400 to-slate-600' },
 };
+
+const DEFAULT_CATEGORY_STYLE = { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', gradient: 'from-slate-400 to-slate-600' };
 
 export default function DigitalLibraryPage() {
   const { profile } = useAuth();
@@ -193,7 +196,7 @@ export default function DigitalLibraryPage() {
       ) : filteredItems.length > 0 ? (
         <div className="grid grid-cols-2 gap-3">
           {filteredItems.map((item, i) => {
-            const catStyle = CATEGORY_COLORS[item.category] || CATEGORY_COLORS['Other'];
+            const catStyle = CATEGORY_COLORS[item.category] ?? DEFAULT_CATEGORY_STYLE;
             const isFree = !item.price || item.price.toLowerCase() === 'free';
             return (
               <motion.div

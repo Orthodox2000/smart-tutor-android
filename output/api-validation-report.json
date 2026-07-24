@@ -1,0 +1,417 @@
+{
+  "timestamp": "2026-07-24T07:48:44.058Z",
+  "summary": {
+    "passed": 69,
+    "failed": 1,
+    "warnings": 11,
+    "total": 81
+  },
+  "results": [
+    {
+      "status": "PASS",
+      "category": "tsc",
+      "message": "TypeScript compilation passed with zero errors"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/login — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/signup — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/logout — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/session — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/me — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/auth/forgot-password — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/forgot-password — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/users — GET, POST, PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/users/profile — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/users/verify — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/profile — PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/profile/change-password — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/profile/delete-account — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/user-requests — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/user-requests/approve — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/user-requests/reject — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/educator-requests — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/educator-requests/approve — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/educator-requests/reject — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/account-bin — GET, PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/stats — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/mongo-status — GET handlers present"
+    },
+    {
+      "status": "FAIL",
+      "category": "routes",
+      "message": "Missing GET handler in /api/admin/bootstrap",
+      "detail": "route.ts does not export function GET"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/admin/bootstrap — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/courses — GET, POST, PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/courses/details — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/tests — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/tests/[testId] — PUT, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/test-submissions — GET, POST, PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/weekly-tests — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/attendance — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/lectures — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/sessions — GET, POST, PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/messages — GET, POST, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/messages/[id] — PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/notifications — GET, POST, PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/direct-messages — GET, POST, PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-feedback — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-feedback/[feedbackId] — PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/daily-activities — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/daily-activities/[activityId] — PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-performance/reports — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-performance/reports/mine — GET handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-performance/reports/[reportId] — GET, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/student-performance/upload-photo — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/certificates — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/certificates/[id] — PATCH, DELETE handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/digital-library — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/invoices — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/invoices/record-payment — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/placement-jobs — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/chat-settings — GET, PATCH handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/smarttutors-chat — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/quiz-arena/generate — POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/mock-test — GET, POST handlers present"
+    },
+    {
+      "status": "PASS",
+      "category": "routes",
+      "message": "/api/reports — GET, POST, PATCH handlers present"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\app\\(protected)\\students\\page.tsx:74"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:40"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:46"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:52"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:61"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:70"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:79"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:88"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:97"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "Hardcoded password found in src\\lib\\mock-data.ts:106"
+    },
+    {
+      "status": "WARN",
+      "category": "security",
+      "message": "GET /api/users/profile returns full user object including password field"
+    },
+    {
+      "status": "PASS",
+      "category": "auth",
+      "message": "All 33 protected routes have session checks"
+    },
+    {
+      "status": "PASS",
+      "category": "models",
+      "message": "User model has all 21 required fields"
+    },
+    {
+      "status": "PASS",
+      "category": "shapes",
+      "message": "POST /api/auth/login returns { success: true, user }"
+    },
+    {
+      "status": "PASS",
+      "category": "shapes",
+      "message": "POST /api/auth/logout returns { success: true }"
+    },
+    {
+      "status": "PASS",
+      "category": "shapes",
+      "message": "GET /api/users returns { users, students }"
+    },
+    {
+      "status": "PASS",
+      "category": "shapes",
+      "message": "GET /api/courses returns { role, courses, courseOptions }"
+    },
+    {
+      "status": "PASS",
+      "category": "shapes",
+      "message": "GET /api/student-feedback returns { feedback, behaviourNotes }"
+    },
+    {
+      "status": "PASS",
+      "category": "soft-delete",
+      "message": "DELETE /api/users uses soft-delete (deletedAt)"
+    },
+    {
+      "status": "PASS",
+      "category": "soft-delete",
+      "message": "GET /api/users excludes soft-deleted users"
+    },
+    {
+      "status": "PASS",
+      "category": "cleanup",
+      "message": "server/ directory removed (no dead duplicates)"
+    },
+    {
+      "status": "PASS",
+      "category": "cleanup",
+      "message": "auth/register renamed to auth/signup"
+    },
+    {
+      "status": "PASS",
+      "category": "build",
+      "message": "Next.js build succeeded — 55 dynamic + 27 static routes"
+    },
+    {
+      "status": "PASS",
+      "category": "build",
+      "message": "55 API routes registered in production build"
+    }
+  ]
+}

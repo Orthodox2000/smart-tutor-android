@@ -89,11 +89,15 @@ export async function PATCH(request: Request) {
 
     await connectToDatabase();
     const body = await request.json();
-    const { id } = body;
+    const { id, read } = body;
 
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    await Notification.findByIdAndUpdate(id, { $addToSet: { readBy: session.id } });
+    if (read === false) {
+      await Notification.findByIdAndUpdate(id, { $pull: { readBy: session.id } });
+    } else {
+      await Notification.findByIdAndUpdate(id, { $addToSet: { readBy: session.id } });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
@@ -106,9 +110,6 @@ export async function DELETE(request: Request) {
     const session = getSessionUser(request);
     if (!session) {
       return NextResponse.json({ error: 'Login required.' }, { status: 401 });
-    }
-    if (session.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

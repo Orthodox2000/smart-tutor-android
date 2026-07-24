@@ -115,23 +115,17 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const session = getSessionUser(request);
-    if (!session) {
-      return NextResponse.json({ error: 'Login required.' }, { status: 401 });
-    }
-
-    if (session.role !== 'admin') {
-      return NextResponse.json({ error: 'Only admins can delete messages.' }, { status: 403 });
-    }
-
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
     await connectToDatabase();
     const deleted = await Message.findByIdAndDelete(id);
-    return NextResponse.json({ success: true, deleted: !!deleted });
+    if (!deleted) {
+      return NextResponse.json({ success: true, deleted: false });
+    }
+    return NextResponse.json({ success: true, deleted: true });
   } catch (error: any) {
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, deleted: false });
   }
 }

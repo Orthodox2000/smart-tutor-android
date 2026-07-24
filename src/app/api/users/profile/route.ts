@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         { uid: uid || undefined },
         { id: id || undefined }
       ]
-    });
+    }).select('-password');
     return NextResponse.json(user);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       update.password = await bcrypt.hash(password, salt);
     }
     
-    const user = await User.findOneAndUpdate(query, update, { new: true });
+    const user = await User.findOneAndUpdate(query, update, { new: true }).select('-password');
     
     return NextResponse.json(user);
   } catch (error: any) {

@@ -1,0 +1,157 @@
+{
+  "timestamp": "2026-07-24T11:07:34.583Z",
+  "passed": 22,
+  "failed": 3,
+  "results": [
+    {
+      "test": "GET /api/admin/stats returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.332Z"
+    },
+    {
+      "test": "GET /api/courses returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.383Z"
+    },
+    {
+      "test": "GET /api/sessions returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.454Z"
+    },
+    {
+      "test": "GET /api/messages returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.525Z"
+    },
+    {
+      "test": "GET /api/notifications returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.582Z"
+    },
+    {
+      "test": "GET /api/tests returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.641Z"
+    },
+    {
+      "test": "GET /api/digital-library returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.698Z"
+    },
+    {
+      "test": "GET /api/users returns 200",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.792Z"
+    },
+    {
+      "test": "POST /api/auth/login succeeds",
+      "status": "FAIL",
+      "detail": "Status: 401",
+      "time": "2026-07-24T11:07:31.870Z"
+    },
+    {
+      "test": "GET /api/auth/session returns user",
+      "status": "FAIL",
+      "detail": "Status: 401",
+      "time": "2026-07-24T11:07:31.921Z"
+    },
+    {
+      "test": "POST /api/auth/logout succeeds",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:31.977Z"
+    },
+    {
+      "test": "Invalid login returns 401",
+      "status": "PASS",
+      "detail": "Status: 401",
+      "time": "2026-07-24T11:07:32.050Z"
+    },
+    {
+      "test": "Empty login body handled",
+      "status": "PASS",
+      "detail": "Status: 400",
+      "time": "2026-07-24T11:07:32.096Z"
+    },
+    {
+      "test": "/api/courses returns array",
+      "status": "PASS",
+      "detail": "Length: 22",
+      "time": "2026-07-24T11:07:32.152Z"
+    },
+    {
+      "test": "/api/notifications returns expected shape",
+      "status": "PASS",
+      "detail": "",
+      "time": "2026-07-24T11:07:32.210Z"
+    },
+    {
+      "test": "DELETE non-existent returns ok or 404",
+      "status": "FAIL",
+      "detail": "Status: 401",
+      "time": "2026-07-24T11:07:32.256Z"
+    },
+    {
+      "test": "Invalid query param handled",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:32.321Z"
+    },
+    {
+      "test": "5 concurrent requests all succeed",
+      "status": "PASS",
+      "detail": "Statuses: 200, 200, 200, 200, 200",
+      "time": "2026-07-24T11:07:32.790Z"
+    },
+    {
+      "test": "Page /",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:33.261Z"
+    },
+    {
+      "test": "Page /courses",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:33.446Z"
+    },
+    {
+      "test": "Page /messages",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:33.629Z"
+    },
+    {
+      "test": "Page /notifications",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:33.816Z"
+    },
+    {
+      "test": "Page /settings",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:34.015Z"
+    },
+    {
+      "test": "Page /profile",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:34.206Z"
+    },
+    {
+      "test": "Page /attendance",
+      "status": "PASS",
+      "detail": "Status: 200",
+      "time": "2026-07-24T11:07:34.580Z"
+    }
+  ]
+}

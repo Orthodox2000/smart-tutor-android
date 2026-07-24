@@ -7,9 +7,6 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 async function ensureDemoUsers() {
-  const count = await User.countDocuments();
-  if (count > 0) return;
-
   const demoUsers = [
     { uid: 'admin-001', username: 'admin', email: 'admin@smarttutors.co.in', displayName: 'System Administrator', role: 'admin' },
     { uid: 'demo-student-001', username: 'demo_student', email: 'student@demo.com', displayName: 'Demo Student', role: 'student', batchNumber: 'BATCH-2026', educationLevel: 'Graduation' },
@@ -18,13 +15,18 @@ async function ensureDemoUsers() {
   ];
 
   for (const u of demoUsers) {
-    await User.findOneAndUpdate({ username: u.username }, u, { upsert: true });
+    const existing = await User.findOne({ username: u.username });
+    if (!existing) {
+      await User.create(u);
+    }
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { login, password, role } = await request.json();
+    const body = await request.json();
+    const login = body.login || body.username || body.email;
+    const { password, role } = body;
 
     if (!login || !password) {
       return NextResponse.json({ error: 'Login credentials are required' }, { status: 400 });

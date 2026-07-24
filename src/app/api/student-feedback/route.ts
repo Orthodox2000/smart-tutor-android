@@ -23,8 +23,10 @@ export async function GET(request: Request) {
       .toArray();
 
     const normalized = feedback.map(normalizeDoc);
+    const feedbackItems = normalized.filter((f: any) => f.type !== 'behaviour');
+    const behaviourNotes = normalized.filter((f: any) => f.type === 'behaviour');
 
-    return NextResponse.json({ feedback: normalized });
+    return NextResponse.json({ feedback: feedbackItems, behaviourNotes });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch feedback' }, { status: 500 });
   }

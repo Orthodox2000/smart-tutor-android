@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import '../index.css';
 import { Providers } from './providers';
-import StartupPermissionsPrompt from '../components/StartupPermissionsPrompt';
 
 export const metadata: Metadata = {
   title: 'Smart Tutors',
@@ -45,7 +44,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning style={{ height: '100%', overflow: 'hidden' }}>
       <body className="font-sans antialiased" suppressHydrationWarning style={{ height: '100%', overflow: 'hidden', position: 'fixed', width: '100%', top: 0, left: 0, margin: 0, padding: 0 }}>
         <Providers>
-          <StartupPermissionsPrompt />
           {children}
         </Providers>
       </body>

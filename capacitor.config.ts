@@ -4,6 +4,10 @@ const config: CapacitorConfig = {
   appId: 'com.ankit.smarttutors',
   appName: 'Smart Tutors',
   webDir: 'out',
+  server: {
+    androidScheme: 'https',
+    allowNavigation: ['smart-tutor-android.vercel.app', '.vercel.app'],
+  },
   plugins: {
     CapacitorHttp: {
       enabled: true,

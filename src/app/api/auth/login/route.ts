@@ -6,22 +6,6 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
-async function ensureDemoUsers() {
-  const demoUsers = [
-    { uid: 'admin-001', username: 'admin', email: 'admin@smarttutors.co.in', displayName: 'System Administrator', role: 'admin' },
-    { uid: 'demo-student-001', username: 'demo_student', email: 'student@demo.com', displayName: 'Demo Student', role: 'student', batchNumber: 'BATCH-2026', educationLevel: 'Graduation' },
-    { uid: 'demo-teacher-001', username: 'demo_faculty', email: 'faculty@demo.com', displayName: 'Demo Faculty', role: 'educator' },
-    { uid: 'demo-parent-001', username: 'demo_parent', email: 'parent@demo.com', displayName: 'Demo Parent', role: 'parent' },
-  ];
-
-  for (const u of demoUsers) {
-    const existing = await User.findOne({ username: u.username });
-    if (!existing) {
-      await User.create(u);
-    }
-  }
-}
-
 async function verifyPassword(inputPassword: string, storedPassword: string): Promise<boolean> {
   if (!storedPassword) return false;
 
@@ -64,12 +48,6 @@ export async function POST(request: Request) {
       );
     }
 
-    try {
-      await ensureDemoUsers();
-    } catch (seedError: any) {
-      console.warn('Demo user seeding skipped:', seedError?.message);
-    }
-
     let user;
     try {
       user = await User.findOne({
@@ -108,35 +86,28 @@ export async function POST(request: Request) {
     }
 
     if (!user.password) {
-      const defaultPasswords = ['password', 'Student@123', user.username, user.id].filter(Boolean);
-      if (defaultPasswords.includes(password)) {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-        await user.save();
-      } else {
-        return NextResponse.json({ error: 'Invalid password. Please use your assigned password.' }, { status: 401 });
-      }
-    } else {
-      let passwordMatch = false;
-      try {
-        passwordMatch = await verifyPassword(password, user.password);
-      } catch (compareError: any) {
-        console.error('Password comparison error:', compareError?.message || compareError);
-        return NextResponse.json(
-          { error: 'Authentication error. Please try again.' },
-          { status: 500 }
-        );
-      }
+      return NextResponse.json({ error: 'No password set for this account. Please contact support.' }, { status: 401 });
+    }
 
-      if (!passwordMatch) {
-        return NextResponse.json({ error: 'Incorrect password. Please try again.' }, { status: 401 });
-      }
+    let passwordMatch = false;
+    try {
+      passwordMatch = await verifyPassword(password, user.password);
+    } catch (compareError: any) {
+      console.error('Password comparison error:', compareError?.message || compareError);
+      return NextResponse.json(
+        { error: 'Authentication error. Please try again.' },
+        { status: 500 }
+      );
+    }
 
-      if (user.password === password && !user.password.startsWith('$2')) {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-        await user.save();
-      }
+    if (!passwordMatch) {
+      return NextResponse.json({ error: 'Incorrect password. Please try again.' }, { status: 401 });
+    }
+
+    if (user.password === password && !user.password.startsWith('$2')) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+      await user.save();
     }
 
     const token = jwt.sign(
@@ -147,6 +118,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({
       success: true,
+      token,
       user: {
         id: user.id,
         uid: user.uid,

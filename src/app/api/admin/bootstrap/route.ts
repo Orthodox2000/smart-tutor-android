@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import User from '@/models/User';
 import Course from '@/models/Course';
 import LibraryItem from '@/models/LibraryItem';
 import Test from '@/models/Test';
@@ -17,40 +16,7 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
 
-    // 1. Create Default Admin if not exists
-    const adminExists = await User.findOne({ role: 'admin' });
-    if (!adminExists) {
-      await User.create({
-        uid: 'admin-uid-placeholder',
-        username: 'admin',
-        email: 'admin@smarttutors.co.in',
-        displayName: 'System Administrator',
-        role: 'admin',
-      });
-    }
-
-    // 2. Create Demo Accounts
-    const demoStudent = {
-      uid: 'demo-student-uid',
-      username: 'demo_student',
-      email: 'student@demo.com',
-      displayName: 'Demo Student',
-      role: 'student',
-      batchNumber: 'BATCH-2026',
-      educationLevel: 'Graduation'
-    };
-    await User.findOneAndUpdate({ username: demoStudent.username }, demoStudent, { upsert: true });
-
-    const demoTeacher = {
-      uid: 'demo-teacher-uid',
-      username: 'demo_faculty',
-      email: 'faculty@demo.com',
-      displayName: 'Demo Faculty',
-      role: 'teacher',
-    };
-    await User.findOneAndUpdate({ username: demoTeacher.username }, demoTeacher, { upsert: true });
-
-    // 3. Seed Initial Courses (No images as requested)
+    // Seed Initial Courses
     const initialCourses = [
       {
         title: 'Mathematics Advanced',

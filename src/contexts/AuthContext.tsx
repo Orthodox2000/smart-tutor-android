@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { apiFetch } from '../lib/api';
+import { apiFetch, setAuthToken, getAuthToken } from '../lib/api';
 
 export type UserRole = 'student' | 'educator' | 'admin' | 'parent';
 
@@ -71,10 +71,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (identifier: string, pass: string, role?: string) => {
     setLoading(true);
     try {
-      const data = await apiFetch<{ user: UserProfile }>('/auth/login', {
+      const data = await apiFetch<{ user: UserProfile; token?: string }>('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ login: identifier, password: pass, role: role || 'student' }),
+        body: JSON.stringify({ login: identifier, password: pass, role: role || 'student' },
+        ),
       });
+
+      if (data.token) {
+        setAuthToken(data.token);
+      }
 
       setProfile(data.user);
       setUser({ id: data.user.id, uid: data.user.uid, email: data.user.email });
@@ -89,12 +94,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       await apiFetch('/auth/logout', { method: 'POST' });
-      setUser(null);
-      setProfile(null);
     } catch {
+    } finally {
+      setAuthToken(null);
       setUser(null);
       setProfile(null);
-    } finally {
       setLoading(false);
     }
   };

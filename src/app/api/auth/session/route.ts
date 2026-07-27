@@ -6,10 +6,19 @@ import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('smart_tutor_session')?.value;
+    let token: string | undefined;
+
+    const authHeader = request.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    }
+
+    if (!token) {
+      const cookieStore = await cookies();
+      token = cookieStore.get('smart_tutor_session')?.value;
+    }
 
     if (!token) {
       return NextResponse.json({ user: null }, { status: 401 });

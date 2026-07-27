@@ -14,12 +14,19 @@ const LOGIN_ROLES = [
 ] as const;
 
 const getFriendlyErrorMessage = (error: any) => {
-  const msg = error?.message || '';
-  if (msg.includes('not found')) return 'No account found with these credentials.';
-  if (msg.includes('Invalid credentials')) return 'Incorrect password. Please try again.';
-  if (msg.includes('registered as')) return msg;
-  if (msg.includes('network') || msg.includes('fetch') || msg.includes('Network')) return 'Network error. Please check your internet connection.';
-  return msg || 'Something went wrong. Please try again.';
+  const msg = (error?.message || '').toLowerCase();
+  if (msg.includes('no account found') || msg.includes('not found')) return 'No account found with that username or email.';
+  if (msg.includes('incorrect password') || msg.includes('wrong password')) return 'Incorrect password. Please try again.';
+  if (msg.includes('invalid password')) return 'Invalid password. Please use your assigned password.';
+  if (msg.includes('registered as')) return error.message;
+  if (msg.includes('pending approval')) return 'Your account is pending admin approval. Please wait.';
+  if (msg.includes('deactivated')) return 'This account has been deactivated. Please contact support.';
+  if (msg.includes('username and password are required')) return 'Please enter both username and password.';
+  if (msg.includes('unable to connect') || msg.includes('cannot reach') || msg.includes('database')) return 'Unable to connect to server. Please try again later.';
+  if (msg.includes('timed out') || msg.includes('timeout')) return 'Connection timed out. Please check your internet.';
+  if (msg.includes('network') || msg.includes('fetch') || msg.includes('failed to fetch')) return 'Network error. Please check your internet connection.';
+  if (msg.includes('unexpected error') || msg.includes('internal server')) return 'Something went wrong. Please try again.';
+  return error?.message || 'Something went wrong. Please try again.';
 };
 
 export default function LoginPage() {

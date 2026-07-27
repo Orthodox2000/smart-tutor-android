@@ -13,3 +13,12 @@ android
 firebase-blueprint.json 
 /firebase.rules
 backup/
+certificates/*.der
+certificates/*.pem
+certificates/*.p12
+certificates/*.pfx
+certificates/*.jks
+certificates/*.keystore
+certificates/play-store-credentials.json
+output/
+test-results/

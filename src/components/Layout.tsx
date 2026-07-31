@@ -32,7 +32,8 @@ import {
   FileCheck,
   Trophy,
   GraduationCap,
-  Star
+  Star,
+  ScrollText
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { icon: Coins, label: 'Fees & Invoices', path: '/fees', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: Briefcase, label: 'Placements', path: '/placements', roles: ['student', 'admin'] },
     { icon: Users, label: 'Management', path: '/students', roles: ['admin', 'educator'] },
+    { icon: ScrollText, label: 'Audit Logs', path: '/audit-logs', roles: ['admin'] },
     { icon: Star, label: 'Student Feedback', path: '/feedback', roles: ['educator'] },
     { icon: ContactIcon, label: 'Contact Us', path: '/contact', roles: ['student', 'educator', 'admin', 'parent'] },
     { icon: BookOpen, label: 'Courses', path: '/courses', roles: ['student', 'educator', 'admin', 'parent'] },

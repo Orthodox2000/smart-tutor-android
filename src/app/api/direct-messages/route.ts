@@ -4,6 +4,7 @@ import DirectMessage from '@/models/DirectMessage';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { logAction } from '@/lib/audit-log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -268,6 +269,18 @@ export async function POST(request: Request) {
       contentType,
       fileUrl,
       read: false,
+    });
+
+    logAction({
+      action: 'create',
+      category: 'messages',
+      details: `Direct message sent to ${receiverId}`,
+      metadata: { messageId: msg._id.toString(), receiverId, contentType },
+      request,
+      userId: session.id,
+      userName: me?.displayName || me?.name || me?.username || session.username,
+      userRole: session.role,
+      statusCode: 201,
     });
 
     return NextResponse.json({

@@ -9,373 +9,560 @@ Authentication: HTTP-only cookie (`smart_tutor_session`) set on login. All authe
 ## 1. Auth
 
 ### POST /api/auth/login
-**Body:** `{ login: string, password: string, role?: "student" | "educator" | "admin" | "parent" }`
-**Response:** Sets session cookie. Returns `{ success: true, user: UserProfile }` or `{ error: string }`.
-
-### POST /api/auth/signup
-**Body:** `{ username, email?, password, displayName?, role?, mobile?, dob?, educationLevel?, program? }`
-**Response:** Sets session cookie. Returns `{ success: true, user: { id, uid, username, email, displayName, role } }`.
+**Body:** `{ login: string, password: string, role: "student" | "educator" | "parent" }`
+**Response:** Sets session cookie. Returns `{ redirectTo?: string }` or `{ error: string }`.
 
 ### POST /api/auth/logout
 **Body:** (none)
 **Response:** Clears session cookie. Returns `{ success: true }`.
 
 ### GET /api/auth/session
-**Response:** `{ user: UserProfile | null }`
+**Response:** `{ user: SessionUser | null }`
+
+### POST /api/auth/signup
+**Body:** Full registration payload (name, email, password, mobile, role, studentType, parent details, courseWanted, education fields, address, etc.)
+**Response:** Sets session cookie. Returns `{ redirectTo: "/application-submitted" }` or `{ error: string }`.
 
 ### POST /api/forgot-password
-**Body:** `{ name, email, phone?, lastPassword?, role }`
+**Body:** `{ name, email, phone, lastPassword, role }`
 **Response:** `{ message: "Your request has been submitted..." }`
 
 ---
 
-## 2. Profile
+## 2. Dashboard
 
-### PATCH /api/profile
-**Body:** `{ name?, profilePhoto?, mobile?, dob?, gender?, addressLine1?, addressLine2?, city?, state?, pincode?, guardianPhone?, qualification?, experience?, subjects? }`
-**Response:** `{ user: ManagedUser }`
-
-### POST /api/profile/change-password
-**Body:** `{ currentPassword, newPassword }` (min 8 chars)
-**Response:** `{ success: true }` or 403 `{ error: "Current password is incorrect." }`
-
-### POST /api/profile/delete-account (Admin only)
-**Body:** `{ password }`
-**Response:** `{ ok: true }` + clears cookie
+### GET /api/dashboard
+**Response:** Full `DashboardBundle` (stats, courses, tests, messages, submissions, attendance, invoices, lectures, profile, batches, weekly tests, feedback, activities, fees, payouts, notifications, analytics, **certificates**).
 
 ---
 
 ## 3. Users (Admin)
 
 ### GET /api/users
-**Response:** `{ users: ManagedUser[], students: StudentDirectoryEntry[] }`
+**Response:** `{ users: ManagedUser[], studentDirectory: ManagedUser[] }`
 
 ### POST /api/users
-**Body:** `{ name, email, password, role?, program?, confirm: true, mobile?, assignedFacultyIds? }`
-**Response (201):** `{ user: ManagedUser }`
+**Body:** `{ name, email, role, password, program?, mobile?, parentMobile?, assignedFacultyIds?, counsellorId? }`
 
 ### PATCH /api/users
 **Body:** `{ id, name?, email?, role?, password?, program?, status?, verified?, assignedFacultyIds? }`
-**Response:** `{ user: ManagedUser }`
-
-### DELETE /api/users
-**Body:** `{ id }` or Query `?id=<id>`
-**Response:** `{ ok: true, message: "User deleted." }` (soft-delete)
 
 ### POST /api/users/verify
-**Body:** `{ userId, verified? }`
-**Response:** `{ ok: true, message }`
+**Body:** `{ userId }` — Toggles verified status.
 
 ---
 
-## 4. Admin Requests
-
-### GET /api/admin/user-requests
-**Response:** `{ ok: true, requests: ManagedUser[] }` (pending students, excludes soft-deleted)
-
-### POST /api/admin/user-requests/approve
-**Body:** `{ userId }` — Sets status "active", verified true.
-**Response:** `{ ok: true, message, user }`
-
-### POST /api/admin/user-requests/reject
-**Body:** `{ userId }` — Soft-deletes (sets deletedAt).
-**Response:** `{ ok: true, message }`
-
-### GET /api/admin/educator-requests
-**Response:** `{ ok: true, requests: ManagedUser[] }` (pending educators)
-
-### POST /api/admin/educator-requests/approve
-**Body:** `{ userId }` — Sets status "active", verified true.
-
-### POST /api/admin/educator-requests/reject
-**Body:** `{ userId }` — Sets status "rejected" + deletedAt.
-
-### Account Bin (Soft-Delete Management)
-- **GET /api/admin/account-bin** — `{ users: ManagedUser[] }`
-- **PATCH /api/admin/account-bin** — `{ id }` — Restore
-- **DELETE /api/admin/account-bin** — `{ id }` — Permanent delete
-
----
-
-## 5. Courses
+## 4. Courses
 
 ### GET /api/courses
-**Response:** `{ role: string, courses: CourseItem[], courseOptions: CourseOption[] }`
+**Response:** `{ courses: CourseItem[], options: StandardCourseOption[] }`
 
-### POST /api/courses (Educator/Admin)
-**Body:** Full course object.
-**Response (201):** `{ course: CourseItem }`
+### POST /api/courses
+**Body:** Full course object (educator/admin).
 
-### PATCH /api/courses (Admin)
-**Body:** `{ id, ...fields }`
-**Response:** `{ course: CourseItem }`
+### PATCH /api/courses
+**Body:** `{ id, ...fields }` (admin).
 
-### DELETE /api/courses?courseId=<id> (Admin)
+### DELETE /api/courses?courseId=<id>
 
 ### GET /api/courses/details
-**Response:** `{ courses: CourseItem[], timestamp: string }`
+**Response:** `{ courses: DetailedCourse[], timestamp: string }`
 
 ---
 
-## 6. Tests & Submissions
+## 5. Batches
+
+### GET /api/batches
+**Response:** `{ batches: Batch[] }`
+
+### POST /api/batches
+**Body:** `{ name, code?, courseName?, subject?, capacity?, schedule?, startDate?, studentIds?, teacherIds? }`
+
+### PATCH /api/batches
+**Body:** `{ id, ...fields }` or `{ id, action: "assign-teacher" | "remove-teacher", teacherId }`
+
+### DELETE /api/batches?id=<id>
+
+---
+
+## 6. Lectures
+
+### GET /api/lectures
+**Response:** `{ lectures: LectureItem[] }`
+
+### POST /api/lectures
+**Body:** Full lecture object + sends notifications.
+
+### PATCH /api/lectures/<lectureId>
+**Body:** Fields to update (title, subject, timing, meeting links, report fields).
+
+---
+
+## 7. Attendance
+
+### GET /api/attendance
+**Response:** `{ sheets: AttendanceSheet[] }`
+
+### POST /api/attendance
+**Body:** `{ title, date, batchName?, subject?, records: AttendanceRecord[], lectureId?, batchId? }`
+
+### PATCH /api/attendance/<attendanceId>
+**Body:** Fields to update.
+
+### DELETE /api/attendance/<attendanceId>
+
+---
+
+## 8. Tests & Submissions
 
 ### GET /api/tests
 **Response:** `{ tests: TestItem[] }`
 
-### POST /api/tests (Educator/Admin)
-**Body:** `{ title, status, summary, assignedUserIds?, questions }`
-**Response (201):** `{ test: TestItem }`
-
-### PUT /api/tests/[testId] (Educator/Admin)
-**Body:** Partial test fields.
-**Response:** `{ test: TestItem }`
-
-### DELETE /api/tests/[testId] (Educator/Admin)
-**Response:** `{ deleted: true }`
+### POST /api/tests
+**Body:** `{ title, status, summary, audience, assignedUserIds?, questions }`
 
 ### GET /api/test-submissions
 **Response:** `{ submissions: TestSubmission[] }`
 
-### POST /api/test-submissions (Student)
-**Body:** `{ testId, answers: number[] }`
-**Response (201):** `{ submission: TestSubmission }`
+### POST /api/test-submissions
+**Body:** `{ testId, answers: { questionId, answer }[] }` — auto-grades.
 
-### PATCH /api/test-submissions (Educator/Admin)
-**Body:** `{ submissionId, score?, feedback? }`
-**Response:** `{ submission: TestSubmission }`
+### PATCH /api/test-submissions
+**Body:** `{ submissionId, score, feedback }` — manual grading.
 
 ---
 
-## 7. Weekly Tests
+## 9. Weekly Tests
 
 ### GET /api/weekly-tests
 **Response:** `{ weeklyTests: WeeklyTest[] }`
 
-### POST /api/weekly-tests (Educator/Admin)
+### POST /api/weekly-tests
 **Body:** `{ title, batchId, subject, testDate, totalMarks, results }`
+
+### PATCH /api/weekly-tests/<weeklyTestId>
+**Body:** Fields to update.
+
+### DELETE /api/weekly-tests/<weeklyTestId>
 
 ---
 
-## 8. Messages (Notice Board)
+## 10. Messages
 
 ### GET /api/messages
 **Response:** `{ messages: MessageItem[] }`
 
-### POST /api/messages (Educator/Admin)
-**Body:** `{ title, body, channel?, audience?, userIds?, authorName?, expiresAt? }`
-**Response (201):** `{ message: MessageItem }`
+### POST /api/messages
+**Body:** `{ title, body, channel, audience?, userIds? }` — Role-enforced (students → assigned faculty or admin; educators → admin or their students; admin → all).
 
-### PATCH /api/messages/[id] (Educator/Admin)
+### PATCH /api/messages/<id>
 **Body:** `{ title?, body?, channel?, expiresAt? }`
-**Response:** `{ message: MessageItem }`
 
-### DELETE /api/messages?id=<id>
+### DELETE /api/messages/<id>
 
 ---
 
-## 9. Notifications
+## 11. Notifications
 
 ### GET /api/notifications
-**Response:** `{ notifications: AppNotification[] }` (each has `read: boolean`)
+**Response:** `{ notifications: AppNotification[] }`
 
-### POST /api/notifications (Educator/Admin)
-**Body:** `{ title, message, type?, link?, audience?: "everyone" | "selected-users", userIds? }`
-**Response (201):** `{ id, success: true }`
+### POST /api/notifications
+**Body:** `{ title, message, type, link?, audience: "everyone" | "selected-users", userIds? }`
 
-### PATCH /api/notifications
-**Body:** `{ id, read?: boolean }`
-**Response:** `{ success: true }`
+### PATCH /api/notifications/<notificationId>
+**Body:** `{ read: boolean }`
 
-### DELETE /api/notifications?id=<id>
+### DELETE /api/notifications/<notificationId>
 
 ---
 
-## 10. Direct Messages (Chat)
-
-### GET /api/direct-messages
-**No query:** `{ conversations: Conversation[] }`
-**With ?userId=:** `{ messages: DirectMessage[] }`
-
-### POST /api/direct-messages
-**Body:** `{ receiverId, content, contentType?, fileUrl? }`
-**Response (201):** `{ message: DirectMessage }`
-
-### PATCH /api/direct-messages
-**Body:** `{ userId }` — marks messages as read.
-
----
-
-## 11. Student Feedback & Behaviour
+## 12. Student Feedback & Behaviour
 
 ### GET /api/student-feedback
-**Response:** `{ feedback: TeacherFeedback[], behaviourNotes: TeacherFeedback[] }`
+**Response:** `{ feedback: TeacherFeedback[], behaviourNotes: BehaviourNote[] }`
 
-### POST /api/student-feedback (Educator/Admin)
+### POST /api/student-feedback
 **Body (feedback):** `{ type: "feedback", studentId, batchId, subject?, category, strengths?, areasToImprove?, feedback, visibleToParent }`
 **Body (behaviour):** `{ type: "behaviour", studentId, batchId?, rating, note, actionTaken?, visibleToParent }`
 
-### PATCH /api/student-feedback/[feedbackId]
+### PATCH /api/student-feedback/<feedbackId>
 **Body:** Fields to update.
 
-### DELETE /api/student-feedback/[feedbackId]
+### DELETE /api/student-feedback/<feedbackId>
 
 ---
 
-## 12. Daily Activities
+## 13. Daily Activities
 
 ### GET /api/daily-activities
 **Response:** `{ activities: StudentDailyActivity[] }`
 
-### POST /api/daily-activities (Educator/Admin)
-**Body:** `{ studentId, batchId, subject?, date, topicStudied?, homeworkCompleted, ... }`
+### POST /api/daily-activities
+**Body:** `{ studentId, batchId, subject?, date, topicStudied?, homeworkCompleted, assignmentCompleted, revisionCompleted, doubtsRaised?, participation, studyMinutes?, teacherVerified, teacherNote?, visibleToParent }`
 
-### PATCH /api/daily-activities/[activityId]
-### DELETE /api/daily-activities/[activityId]
+### PATCH /api/daily-activities/<activityId>
+**Body:** Fields to update.
+
+### DELETE /api/daily-activities/<activityId>
 
 ---
 
-## 13. Performance Reports
+## 14. Fees & Invoices
 
-### GET /api/student-performance/reports (Educator/Admin)
+### GET /api/invoices
+**Query:** `?studentId=<id>` (educator/admin)
+**Response:** `{ invoices: FeeInvoice[] }`
+
+### POST /api/invoices
+**Body:** `{ studentId, title, amount, dueDate, ... }`
+
+### PATCH /api/invoices/<invoiceId>
+**Body:** Fields to update (admin).
+
+### DELETE /api/invoices/<invoiceId> (admin)
+
+---
+
+## 15. Fee Installments
+
+### GET /api/fee-installments
+**Response:** `{ plans: FeeInstallmentPlan[] }`
+
+### POST /api/fee-installments
+**Body:** Full plan with installments array (admin).
+
+### PATCH /api/fee-installments/<planId>
+**Body:** Fields to update (admin).
+
+### DELETE /api/fee-installments/<planId> (admin)
+
+---
+
+## 16. Teacher Payouts
+
+### GET /api/teacher-payouts
+**Response:** `{ payouts: TeacherPayout[] }`
+
+### PATCH /api/teacher-payouts/<payoutId>
+**Body:** Fields to update (admin).
+
+### DELETE /api/teacher-payouts/<payoutId> (admin)
+
+---
+
+## 17. Performance Reports
+
+### GET /api/student-performance/reports
 **Response:** `{ reports: PerformanceReport[] }`
 
-### GET /api/student-performance/reports/mine (All Roles)
-**Response:** `{ reports: PerformanceReport[] }` (own reports)
+### GET /api/student-performance/reports/<reportId>
+**Response:** Single `PerformanceReport`.
 
-### GET /api/student-performance/reports/[reportId]
-**Response:** Single `PerformanceReport`
+### GET /api/student-performance/reports/mine
+**Response:** Student's own reports.
 
-### POST /api/student-performance/reports (Educator/Admin)
-**Body:** Full report object.
+### POST /api/student-performance/reports
+**Body:** Full `PerformanceReport` object.
 
 ### DELETE /api/student-performance/reports?id=<id>
+
+### GET /api/student-performance/registered-students
+**Response:** `[ { id, name, program } ]`
 
 ### POST /api/student-performance/upload-photo
 **FormData:** `photo` (PNG/JPG/WEBP, max 2 MB)
 
 ---
 
-## 14. Certificates
-
-### GET /api/certificates
-**Response:** `{ certificates: Certificate[] }` (students see own, admin sees all)
-
-### POST /api/certificates (Admin)
-**Body:** `{ templateId, recipientId, recipientName, recipientType?, title, description, courseName?, issuedDate? }`
-**Response (201):** `Certificate` with auto-generated `certificateNo: "CERT-{timestamp}"`
-
-### PATCH /api/certificates/[id] (Admin)
-**Body:** `{ status?: "issued" | "revoked", revokeReason? }`
-
-### DELETE /api/certificates/[id] (Admin)
-
----
-
-## 15. Fees & Invoices
-
-### GET /api/invoices
-**Response:** `{ feeInvoices: FeeInvoice[] }`
-
-### POST /api/invoices (Admin)
-**Body:** `{ studentId, title, amount, dueDate, ... }`
-**Response (201):** `{ feeInvoice: FeeInvoice }` with auto-generated `receiptNo`
-
-### POST /api/invoices/record-payment (Admin)
-**Body:** `{ invoiceId, paidAmount, paymentMode?, paidDate?, transactionId? }`
-
----
-
-## 16. Digital Library
+## 18. Digital Library
 
 ### GET /api/digital-library
-**Response:** `{ success: true, books: LibraryBook[], canManage: boolean, isLoggedIn: boolean, role }`
+**Response:** `{ books: LibraryBook[], sections, canManage, isLoggedIn, role }`
 
-### POST /api/digital-library (Educator/Admin)
-**Body:** Full library item object.
+### POST /api/digital-library
+**Body:** `{ title, price, description, category, section?, pdfUrl?, thumbnailUrl?, fileSize?, storageType?, megaFileId?, megaDecryptionKey? }`
 
----
+### PATCH /api/digital-library/<bookId>
+**Body:** Fields to update.
 
-## 17. Lectures
+### DELETE /api/digital-library/<bookId>
 
-### GET /api/lectures
-**Response:** `{ lectures: LectureItem[] }`
+### POST /api/digital-library/upload
+**Body:** `{ fileType: "pdf" | "thumbnail", contentType, contentLength }`
+**Response:** Signed upload URL for Vercel Blob.
 
-### POST /api/lectures (Educator/Admin)
-**Body:** `{ title, subject?, meetingLink?, timing?, target?, teacherId?, teacherName? }`
+### GET /api/digital-library/download?pathname=<path>
+**Response:** Redirects to download URL.
 
----
+### GET /api/digital-library/sections
+**Response:** `{ sections }`
 
-## 18. Attendance
-
-### GET /api/attendance
-**Response:** `{ sheets: AttendanceSheet[] }`
-
-### POST /api/attendance (Educator/Admin)
-**Body:** `{ title, date, subject?, records?, createdBy? }`
+### POST /api/digital-library/sections
+**Body:** `{ slug, label, description }`
 
 ---
 
 ## 19. Placements
 
 ### GET /api/placement-jobs
+**Query:** `?scope=admin` (for drafts)
 **Response:** `{ jobs: PlacementJob[] }`
 
-### POST /api/placement-jobs (Admin)
+### POST /api/placement-jobs
+**Body:** Full `PlacementJob` object (admin).
+
+### GET /api/placement-jobs/<jobId>
+
+### PATCH /api/placement-jobs/<jobId>
+**Body:** Fields to update (admin).
+
+### DELETE /api/placement-jobs/<jobId> (admin)
+
+### GET /api/placement-applications
+**Response:** `{ applications: PlacementApplication[] }`
+
+### POST /api/placement-applications
+**Body:** `{ jobId, answers, resumeUrl }`
+
+### PATCH /api/placement-applications/<applicationId>
+**Body:** `{ status }` (admin)
 
 ---
 
-## 20. Quiz Arena
+## 20. Enquiries (Public + Admin)
+
+### GET /api/enquiries (admin)
+**Response:** `{ enquiries: Enquiry[] }`
+
+### POST /api/enquiries (public)
+**Body:** `{ name, contact, role, courseTitle, courseKey, message, suggestedCourses? }`
+
+---
+
+## 21. CRM
+
+### GET /api/crm/leads
+**Response:** Full CRM workspace (admin: all, counsellor: own).
+
+### POST /api/crm/leads
+**Body:** `{ name, email?, phone?, courseInterest?, source?, priority?, assignedTo?, notes? }`
+
+### PATCH /api/crm/leads/<leadId>
+**Body:** `{ action: "update" | "note" | "call" | "demo" | "admission" | "lost", ... }`
+
+### DELETE /api/crm/leads/<leadId> (admin)
+
+### GET /api/crm/staff (admin)
+### POST /api/crm/staff (admin)
+### PATCH /api/crm/staff (admin)
+### DELETE /api/crm/staff (admin)
+
+### POST /api/crm/import (admin — CSV upload)
+### GET /api/crm/backup (admin — JSON export)
+
+---
+
+## 22. Admin
+
+### GET /api/admin/user-requests — Pending students (excludes soft-deleted)
+### POST /api/admin/user-requests/approve — `{ userId }` (rejects if soft-deleted)
+### POST /api/admin/user-requests/reject — `{ userId }` (soft-deletes, NOT permanent delete)
+### GET /api/admin/educator-requests — Pending educators (excludes soft-deleted)
+### POST /api/admin/educator-requests/approve — `{ userId }` (rejects if soft-deleted)
+### POST /api/admin/educator-requests/reject — `{ userId }` (soft-deletes + sets status "rejected")
+### GET /api/admin/password-reset-requests
+### PATCH /api/admin/password-reset-requests — `{ id, status, adminNote? }`
+### GET /api/admin/mongo-status
+### GET|POST /api/admin/bootstrap — Seed database (requires bootstrap key)
+
+### Account Bin (Soft-Delete Management)
+### GET /api/admin/account-bin — List all soft-deleted users
+### PATCH /api/admin/account-bin — `{ id }` — Restore a soft-deleted user
+### DELETE /api/admin/account-bin — `{ id }` — Permanently delete a user from bin
+
+### GET /api/admin/audit-logs — Audit log viewer (admin only)
+**Query:**
+- `?page=1&limit=50` — Pagination (limit max 200)
+- `?action=login|logout|create|update|delete|approve|reject|restore|import|bulk_operation` — Filter by action
+- `?category=auth|fees|payout|courses|users|roles|students|attendance|messages|library|performance|settings|exams|homework|certificates|placement|crm|leave|communication|complaints|feedback|enquiries|payroll|expenses|other` — Filter by category
+- `?search=<text>` — Search across details, user name, email, IP, path
+- `?userId=<id>` — Filter by specific user
+- `?ip=<address>` — Filter by IP address
+- `?dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD` — Date range filter
+- `?sortBy=timestamp|action|category|userName|ip` — Sort column (default: `timestamp`)
+- `?sortOrder=desc|asc` — Sort direction (default: `desc`)
+- `?stats=true` — Returns aggregate stats instead of log entries
+
+**Response (paginated):**
+```json
+{
+  "logs": [
+    {
+      "id": "string",
+      "action": "login|logout|create|update|delete|approve|reject|restore|import|bulk_operation",
+      "category": "auth|fees|payout|courses|users|roles|students|attendance|messages|library|performance|settings|exams|homework|certificates|placement|crm|leave|communication|complaints|feedback|enquiries|payroll|expenses|other",
+      "userId": "string|null",
+      "userEmail": "string|null",
+      "userName": "string|null",
+      "userRole": "string|null",
+      "details": "string",
+      "metadata": { },
+      "ip": "string",
+      "userAgent": "string",
+      "browser": "string|null",
+      "os": "string|null",
+      "device": "string|null",
+      "referer": "string|null",
+      "path": "string",
+      "method": "string",
+      "timestamp": "ISO date string"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 50, "total": 123 }
+}
+```
+
+**Response (`?stats=true`):**
+```json
+{
+  "totalLogs": 1234,
+  "todayLogs": 42,
+  "uniqueUsers": 56,
+  "uniqueIps": 89,
+  "topAction": "login",
+  "topCategory": "auth",
+  "byAction": { "login": 400, "logout": 380, ... },
+  "byCategory": { "auth": 780, "fee": 200, ... }
+}
+```
+
+---
+
+## 23. Certificates (Admin Issue + All Roles Download)
+
+### GET /api/certificates
+**Query:** `?recipientId=<id>&status=issued`
+**Auth:** Required. Students/parents see only their own certificates. Admin sees all.
+**Response:** `{ certificates: Certificate[] }`
+
+### POST /api/certificates
+**Auth:** Admin only.
+**Body:**
+```json
+{
+  "templateId": "classic-gold | modern-blue | professional-dark",
+  "recipientId": "string",
+  "recipientName": "string",
+  "recipientType": "student | educator | parent",
+  "recipientEmail?": "string",
+  "title": "string (e.g., Certificate of Excellence)",
+  "description": "string (detailed achievement description)",
+  "courseName?": "string",
+  "issuedDate": "YYYY-MM-DD",
+  "issuedBy": "admin-user-id",
+  "issuedByName": "Admin Name"
+}
+```
+**Response:** `{ certificate: Certificate }` (201)
+**Note:** `id`, `certificateNo` (auto-generated ST-YYYY-XXXX), `status` ("issued"), and `createdAt` are auto-set.
+
+### GET /api/certificates/:id
+**Auth:** None (public read for verification).
+**Response:** `{ certificate: Certificate }` or 404.
+
+### PATCH /api/certificates/:id
+**Auth:** Admin only.
+**Body:** `{ status: "issued" | "revoked", revokeReason?: "string" }`
+**Response:** `{ certificate: Certificate }` — On revoke, sets `revokedAt`, `revokedBy`, `revokeReason`.
+
+### DELETE /api/certificates/:id
+**Auth:** Admin only.
+**Response:** `{ success: true }`
+
+### Certificate Data Type
+```json
+{
+  "id": "string",
+  "templateId": "classic-gold | modern-blue | professional-dark",
+  "recipientId": "string",
+  "recipientName": "string",
+  "recipientType": "student | educator | parent",
+  "recipientEmail?": "string",
+  "title": "string",
+  "description": "string",
+  "courseName?": "string",
+  "issuedDate": "YYYY-MM-DD",
+  "issuedBy": "string",
+  "issuedByName": "string",
+  "certificateNo": "ST-YYYY-XXXX",
+  "status": "issued | revoked",
+  "revokedAt?": "ISO 8601",
+  "revokedBy?": "string",
+  "revokeReason?": "string",
+  "createdAt": "ISO 8601",
+  "updatedAt?": "ISO 8601"
+}
+```
+
+### Certificate Templates
+| Template ID | Name | Style |
+|---|---|---|
+| `classic-gold` | Classic Gold | Traditional gold borders, serif typography, gold seal |
+| `modern-blue` | Modern Blue | Clean blue accents, sans-serif, geometric corners |
+| `professional-dark` | Professional Dark | Dark slate theme, silver accents, diamond decorations |
+
+### Dashboard Integration
+Certificates appear in the `DashboardBundle.certificates` array. Student, educator, and parent dashboards show a "Certificates" sidebar section with downloadable certificates. Admin has a full certificate management panel to issue, preview, revoke, and delete certificates.
+
+---
+
+## 24. Payments
+
+### POST /api/payments/create-order
+**Body:** `{ amount, currency?, receipt? }`
+**Response:** `{ orderId, amount, currency, keyId }`
+
+### POST /api/payments/verify
+**Body:** `{ razorpay_order_id, razorpay_payment_id, razorpay_signature, invoiceId? }`
+
+---
+
+## 24. Quiz Arena
 
 ### POST /api/quiz-arena/generate
-**Body:** `{ level?, exam?, subject?, difficulty?, count? }`
+**Body:** `{ level, exam, subject, difficulty, count? }`
 **Response:** `{ questions: QuizQuestion[] }`
 
 ---
 
-## 21. AI Chat
+## 25. Misc
 
-### POST /api/smarttutors-chat
-**Body:** `{ message, memory?, history? }`
-**Response:** `{ reply: string }`
+### GET /api/institute
+**Response:** Public institute data (profile, social links, programs, placed students).
 
----
+### GET /api/mock-test
+**Response:** Sample quiz questions for demo.
 
-## 22. Misc
-
-### GET /api/chat-settings
-**Response:** `{ chatEnabled: boolean }`
-
-### PATCH /api/chat-settings (Admin)
-**Body:** `{ chatEnabled: boolean }`
-
-### POST /api/mock-test
-**Body:** `{ testId, studentUid?, studentName?, answers: number[] }`
-**Response:** `{ message, resultId, score, correctAnswers, totalQuestions }`
-
-### POST /api/reports (Flag/Abuse)
-**Body:** `{ targetType, targetId, targetName, reason, description, messageContent? }`
-
-### GET /api/admin/stats
-**Response:** `{ students, courses, faculty, sessions }`
+### POST /api/upload/signup
+**FormData:** `file` (profile photo or CV, max 5 MB)
 
 ---
 
 ## Key Data Types
 
-### UserProfile (returned by session/login)
+### SessionUser
 ```json
-{ "id": "string", "uid": "string", "username": "string", "email": "string", "name": "string", "displayName": "string", "role": "student|educator|admin|parent|counsellor", "photoURL": "string", "label": "string", "status": "active|pending|rejected", "verified": "boolean", "mobile": "string", "program": "string", "assignedFacultyIds": ["string"] }
-```
-
-### ManagedUser
-```json
-{ "id": "string", "name": "string", "email": "string", "mobile": "string", "role": "Role", "label": "string", "status": "active|pending|rejected", "verified": "boolean", "program": "string", "assignedFacultyIds": ["string"], "assignedFacultyNames": ["string"], "parentEmail": "string", "parentMobile": "string", "linkedStudentId": "string", "profilePhoto": "string", "createdAt": "ISO 8601", "updatedAt": "ISO 8601" }
+{ "id": "string", "name": "string", "email": "string", "role": "student|educator|admin|parent|counsellor", "label": "string", "status?": "active|pending|rejected", "verified?": "boolean" }
 ```
 
 ### CourseItem
 ```json
-{ "id": "string", "category": "string", "sections": ["string"], "stream": "string", "statusLabel": "string", "standardKey": "string", "title": "string", "tagline": "string", "schedule": "string", "summary": "string", "description": "string", "duration": "string", "mode": "string", "audienceLabel": "string", "courseNamesIncluded": ["string"], "branchesIncluded": ["string"], "subjectsCovered": ["string"], "points": ["string"], "audience": ["string"] }
+{ "id": "string", "category": "string", "sections": ["string"], "stream?": "Science|Commerce|Arts|General", "statusLabel": "string", "standardKey": "string", "title": "string", "tagline": "string", "schedule": "string", "summary": "string", "description": "string", "duration": "string", "mode": "string", "audienceLabel": "string", "courseNamesIncluded": ["string"], "branchesIncluded": ["string"], "subjectsCovered": ["string"], "points": ["string"], "audience": ["student|educator|admin"] }
 ```
+
+### Role
+`"student" | "educator" | "admin" | "parent" | "counsellor"`
 
 ---
 
@@ -393,8 +580,54 @@ Authentication: HTTP-only cookie (`smart_tutor_session`) set on login. All authe
 
 - All date/time fields are ISO 8601 strings
 - IDs are human-readable (e.g., `student-001`, `course-9-regular-academic`)
-- File uploads use Vercel Blob (signed URLs) or base64 data URLs
+- File uploads use Vercel Blob (signed URLs)
 - Notifications are pushed via API polling (no WebSocket yet)
 - Cookie-based auth means no token management needed on mobile — just use cookie storage
 - Pagination is not implemented yet — all list endpoints return full datasets
-- Soft-delete system: rejected users go to Account Bin, admins can restore or permanently delete
+
+---
+
+## Changelog — July 2026 Update
+
+### Soft-Delete System (Breaking Behavioral Changes)
+
+**What changed:**
+- Rejecting a user request now **soft-deletes** the user (sets `deletedAt` field) instead of permanently deleting them from the database.
+- All admin user listing endpoints now **exclude soft-deleted users** automatically.
+- A new **Account Bin** system allows admins to view, restore, or permanently delete soft-deleted users.
+
+**Impact on mobile app:**
+
+| Endpoint | Before | After |
+|---|---|---|
+| `POST /api/admin/user-requests/reject` | Permanent `deleteOne` | Soft-delete (`deletedAt` set) |
+| `POST /api/admin/educator-requests/reject` | Sets `status: "rejected"` | Sets `status: "rejected"` + `deletedAt` |
+| `GET /api/users` | Included all users | Excludes soft-deleted users |
+| `GET /api/admin/user-requests` | Included all pending | Excludes soft-deleted pending |
+| `GET /api/admin/educator-requests` | Included all pending | Excludes soft-deleted pending |
+
+**New endpoints for admin:**
+
+```
+GET    /api/admin/account-bin     → { users: ManagedUser[] }
+PATCH  /api/admin/account-bin     → { id } → restores user
+DELETE /api/admin/account-bin     → { id } → permanent delete
+```
+
+### Caching / Service Worker Update
+
+**What changed:**
+- Service worker (`/sw.js`) rewritten with network-first strategy for HTML pages.
+- Old service worker used cache-first and cached the HTML shell — caused stale styling after deployments.
+- New SW auto-activates via `skipWaiting()` + `clients.claim()` and cleans old caches.
+
+**Impact on mobile app:**
+- If using WebView/PWA: Users will auto-get the new SW on next visit. No manual cache clear needed.
+- If using native app calling API: No impact — API responses are not cached by the SW.
+
+### Password Handling (Internal — No API Change)
+
+- All passwords are now bcrypt-hashed server-side before storage.
+- Login flow transparently handles both plaintext (legacy) and bcrypt passwords.
+- No API response changes — `passwordHint` field removed from admin user responses.
+- Mobile app login flow is **unchanged**.

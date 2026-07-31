@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 import crypto from 'crypto';
 
 export async function GET(request: Request) {
@@ -32,6 +33,18 @@ export async function POST(request: Request) {
   };
 
   await col.insertOne(doc);
+
+  logAction({
+    action: 'create',
+    category: 'performance',
+    details: `Performance report created for student ${body.studentId || body.studentName || 'unknown'}`,
+    metadata: { reportId: doc.id, studentId: body.studentId, studentName: body.studentName },
+    request,
+    userId: session.id,
+    userName: session.name,
+    userRole: session.role,
+    statusCode: 201,
+  });
 
   return NextResponse.json({ report: normalizeDoc(doc) }, { status: 201 });
 }

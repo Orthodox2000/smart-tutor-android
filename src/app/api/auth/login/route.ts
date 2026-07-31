@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logAction } from '@/lib/audit-log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -149,6 +150,19 @@ export async function POST(request: Request) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
+    });
+
+    logAction({
+      action: 'login',
+      category: 'auth',
+      details: `User logged in (${user.role})`,
+      metadata: { userId: user.id, username: user.username || user.email },
+      request,
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name || user.displayName || user.username,
+      userRole: user.role,
+      statusCode: 200,
     });
 
     return response;

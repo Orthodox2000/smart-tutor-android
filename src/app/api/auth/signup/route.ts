@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { logAction } from '@/lib/audit-log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -80,6 +81,19 @@ export async function POST(request: Request) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
+    });
+
+    logAction({
+      action: 'create',
+      category: 'auth',
+      details: `New student account created (${newUser.username})`,
+      metadata: { userId: id, username: newUser.username, email: newUser.email },
+      request,
+      userId: id,
+      userEmail: newUser.email,
+      userName: newUser.displayName || newUser.username,
+      userRole: newUser.role,
+      statusCode: 201,
     });
 
     return response;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 import crypto from 'crypto';
 
 export async function GET(request: Request) {
@@ -37,6 +38,19 @@ export async function POST(request: Request) {
       submittedAt: new Date().toISOString(),
     };
     await col.insertOne(submission);
+
+    logAction({
+      action: 'create',
+      category: 'exams',
+      details: `Test submission created for test ${testId}`,
+      metadata: { submissionId: submission.id, testId },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json({ submission: normalizeDoc(submission) }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -61,6 +75,19 @@ export async function PATCH(request: Request) {
 
     await col.updateOne({ id: submissionId }, { $set: update });
     const updated = await col.findOne({ id: submissionId });
+
+    logAction({
+      action: 'update',
+      category: 'exams',
+      details: `Test submission graded (${submissionId})`,
+      metadata: { submissionId, score, feedback },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ submission: normalizeDoc(updated) });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

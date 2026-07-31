@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAction } from '@/lib/audit-log';
 
 export const maxDuration = 60;
 
@@ -190,6 +191,15 @@ SmartTutor:`;
         reply: 'I could not generate a response. Please try rephrasing your question, or reach out on WhatsApp at +91 8850447887.',
       });
     }
+
+    logAction({
+      action: 'create',
+      category: 'ai',
+      details: `AI chat query: ${sanitizedMessage.slice(0, 120)}`,
+      metadata: { queryLength: sanitizedMessage.length, replyLength: reply.length },
+      request,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ reply });
   } catch (error: any) {

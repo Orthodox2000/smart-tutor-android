@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
 import jwt from 'jsonwebtoken';
+import { logAction } from '@/lib/audit-log';
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
 function getSessionUser(request: Request) {
@@ -43,6 +44,18 @@ export async function PATCH(request: Request) {
       { $set: { key: 'chat', enabled, updatedAt: new Date() } },
       { upsert: true }
     );
+
+    logAction({
+      action: 'update',
+      category: 'settings',
+      details: `Chat ${enabled ? 'enabled' : 'disabled'}`,
+      metadata: { chatEnabled: enabled },
+      request,
+      userId: session.id,
+      userName: session.username,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ chatEnabled: enabled });
   } catch (error: any) {

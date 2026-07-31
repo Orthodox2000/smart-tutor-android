@@ -22,7 +22,7 @@ export default function EULAPage() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-800">Smart Tutors EULA</p>
-            <p className="text-[10px] text-slate-400 font-medium">Last Updated: January 1, 2025</p>
+            <p className="text-[10px] text-slate-400 font-medium">Last Updated: July 31, 2026</p>
           </div>
         </div>
 
@@ -105,7 +105,29 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">7. Updates and Modifications</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">7. Monitoring &amp; Audit Logging</h2>
+            <p className="mb-2">
+              The App records audit logs of significant user actions to maintain security, accountability,
+              and academic integrity. These logs include:
+            </p>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>The user account performing the action, along with the action type and affected feature</li>
+              <li>Login and logout events, content changes, approvals, rejections, and deletions</li>
+              <li>IP address, platform (web or Android app), device type, operating system, and browser</li>
+              <li>Date and time of each action</li>
+            </ul>
+            <p className="mt-3">
+              Audit logs may be reviewed by authorised administrators for security monitoring, fraud and
+              misuse detection, dispute resolution, and service improvement. By using the App, you consent
+              to this logging. Smart Tutors does not condone, authorise, or accept responsibility for any
+              wrongful, unlawful, or fraudulent conduct by users, including academic dishonesty,
+              impersonation, or misuse of the App. Detected misconduct may result in account suspension or
+              termination and may be reported to your institution or the relevant authorities.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Updates and Modifications</h2>
             <p>
               Smart Tutors may release updates, patches, or new versions of the App from time to time to
               improve functionality, fix bugs, add features, or address security vulnerabilities. Such
@@ -117,7 +139,7 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Termination</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">9. Termination</h2>
             <p>
               This EULA is effective until terminated. Your rights under this EULA will terminate
               automatically if you fail to comply with any of its terms. Upon termination, you must
@@ -129,7 +151,7 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">9. Disclaimer of Warranties</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">10. Disclaimer of Warranties</h2>
             <p>
               THE APP IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, WHETHER
               EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF
@@ -140,7 +162,7 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">10. Limitation of Liability</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Limitation of Liability</h2>
             <p>
               TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL SMART TUTORS, ITS
               DIRECTORS, EMPLOYEES, PARTNERS, OR SUPPLIERS BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
@@ -150,10 +172,20 @@ export default function EULAPage() {
               LIABILITY SHALL NOT EXCEED THE AMOUNT YOU HAVE PAID TO SMART TUTORS IN THE TWELVE (12) MONTHS
               PRECEDING THE CLAIM.
             </p>
+            <p className="mt-3">
+              YOU ARE SOLELY RESPONSIBLE FOR YOUR CONDUCT WHILE USING THE APP AND FOR ANY CONTENT YOU
+              SUBMIT OR SHARE. SMART TUTORS DOES NOT AUTHORISE, CONDONE, OR ACCEPT RESPONSIBILITY FOR ANY
+              WRONGFUL, UNLAWFUL, OR FRAUDULENT ACTIVITY BY USERS, INCLUDING ACADEMIC DISHONESTY,
+              IMPERSONATION, OR MISUSE OF THE APP. WHERE SUCH WRONGDOING IS DETECTED — INCLUDING THROUGH
+              AUDIT LOGS — WE MAY SUSPEND OR TERMINATE THE OFFENDING ACCOUNT AND REPORT THE CONDUCT TO THE
+              RELEVANT INSTITUTION OR AUTHORITIES. SMART TUTORS ASSUMES NO RESPONSIBILITY FOR THE
+              CONSEQUENCES OF USER CONDUCT OR FOR CONTENT GENERATED, SHARED, OR ACTED UPON BY USERS,
+              INCLUDING DECISIONS BASED ON AI-GENERATED OUTPUT.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Governing Law</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">12. Governing Law</h2>
             <p>
               This EULA shall be governed by and construed in accordance with the laws of India. Any
               disputes arising from this EULA or your use of the App shall be subject to the exclusive
@@ -162,7 +194,7 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">12. Changes to This EULA</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">13. Changes to This EULA</h2>
             <p>
               Smart Tutors reserves the right to modify this EULA at any time. Material changes will be
               notified through the App or via email. The &quot;Last Updated&quot; date at the top of this document
@@ -172,7 +204,7 @@ export default function EULAPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">13. Contact</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">14. Contact</h2>
             <p>
               If you have any questions about this EULA, please contact us:
             </p>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 function getText(value: unknown, maxLength = 300) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
@@ -74,6 +75,18 @@ export async function POST(request: Request) {
     );
 
     const updated = await collection.findOne({ id: invoiceId });
+
+    logAction({
+      action: 'update',
+      category: 'fees',
+      details: `Payment of ₹${paidAmount} recorded on invoice ${invoiceId}`,
+      metadata: { invoiceId, paidAmount, paymentMode, status: newStatus },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({
       feeInvoice: normalizeDoc(updated),

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function GET(request: Request) {
   try {
@@ -63,6 +64,19 @@ export async function POST(request: Request) {
     });
 
     const { password: _, ...userObj } = newUser.toObject();
+
+    logAction({
+      action: 'create',
+      category: 'users',
+      details: `User created (${newUser.role}: ${newUser.name})`,
+      metadata: { userId: id, email: newUser.email, role: newUser.role },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json({ user: userObj }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -91,6 +105,18 @@ export async function PATCH(request: Request) {
     const user = await User.findOneAndUpdate({ id }, { $set: update }, { new: true }).select('-password');
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+    logAction({
+      action: 'update',
+      category: 'users',
+      details: `User updated (${user.name || user.email})`,
+      metadata: { userId: id, fields: Object.keys(update) },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ user });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -110,6 +136,19 @@ export async function DELETE(request: Request) {
 
     await connectToDatabase();
     await User.findOneAndUpdate({ id }, { $set: { deletedAt: new Date() } });
+
+    logAction({
+      action: 'delete',
+      category: 'users',
+      details: `User soft-deleted (${id})`,
+      metadata: { userId: id, softDelete: true },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ ok: true, message: 'User deleted.' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

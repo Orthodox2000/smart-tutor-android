@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Test from '@/models/Test';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function GET(request: Request) {
   try {
+    const session = getSessionUser(request);
+    if (!session) return NextResponse.json({ error: 'Login required' }, { status: 401 });
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const id = searchParams.get('id');
@@ -40,6 +44,19 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const body = await request.json();
     const test = await Test.create(body);
+
+    logAction({
+      action: 'create',
+      category: 'exams',
+      details: `Test created (${body.title || 'Untitled'})`,
+      metadata: { testId: test._id?.toString?.() || '', title: body.title, status: body.status },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json(test, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

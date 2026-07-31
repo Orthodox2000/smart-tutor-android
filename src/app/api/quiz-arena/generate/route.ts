@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 const FALLBACK_QUESTIONS: Record<string, Array<{ question: string; options: string[]; correctAnswer: number; explanation: string; category: string }>> = {
   mathematics: [
@@ -42,6 +43,15 @@ const FALLBACK_QUESTIONS: Record<string, Array<{ question: string; options: stri
 export async function POST(request: Request) {
   const body = await request.json();
   const { level, exam, subject, difficulty, count = 5 } = body;
+
+  logAction({
+    action: 'create',
+    category: 'exams',
+    details: `Quiz generated (${subject || 'general'} - ${difficulty || 'medium'})`,
+    metadata: { level, exam, subject, difficulty, count },
+    request,
+    statusCode: 200,
+  });
 
   const col = await getCollection('quiz_questions');
 

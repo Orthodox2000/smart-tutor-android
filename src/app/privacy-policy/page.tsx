@@ -22,7 +22,7 @@ export default function PrivacyPolicyPage() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-800">Smart Tutors</p>
-            <p className="text-[10px] text-slate-400 font-medium">Last Updated: January 1, 2025</p>
+            <p className="text-[10px] text-slate-400 font-medium">Last Updated: July 31, 2026</p>
           </div>
         </div>
 
@@ -68,6 +68,17 @@ export default function PrivacyPolicyPage() {
                   <li>Login timestamps and session duration</li>
                   <li>Features used, pages viewed, and navigation patterns</li>
                   <li>IP address and approximate geolocation</li>
+                  <li>Browser type, referring page, and language preferences</li>
+                </ul>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4">
+                <p className="font-bold text-slate-800 mb-2">Audit &amp; Activity Logs</p>
+                <ul className="list-disc list-inside space-y-1 text-slate-500">
+                  <li>Actions performed on the Platform, such as login, logout, and password changes</li>
+                  <li>Creation, modification, approval, rejection, restoration, and deletion of records and content</li>
+                  <li>Assessment submissions, attendance marking, feedback, and payment transactions</li>
+                  <li>Account details (user ID, role) and the device/IP address used for each action</li>
+                  <li>Timestamps, platform (web or Android app), browser, and operating system</li>
                 </ul>
               </div>
             </div>
@@ -137,12 +148,39 @@ export default function PrivacyPolicyPage() {
               We implement industry-standard security measures including SSL/TLS encryption for data in transit,
               AES-256 encryption for data at rest, role-based access controls, secure authentication via Firebase,
               and regular security audits. While we strive to protect your information, no method of electronic
-              transmission or storage is 100% secure, and we cannot guarantee absolute security.
+              transmission or storage is 100% secure, and we cannot guarantee absolute security. We monitor the
+              Platform for unauthorised access, abuse, and wrongdoing, and we act on any misconduct detected,
+              including through the audit logs described in this Policy. Users remain solely responsible for
+              their own conduct and for the content they choose to share; Smart Tutors does not accept
+              responsibility for user misconduct or for the misuse of information shared by users with others.
             </p>
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">5. Data Retention</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">5. Audit &amp; Activity Logging</h2>
+            <p className="mb-2">
+              To maintain security, accountability, and trust on the Platform, we transparently record
+              audit logs of significant actions taken by users. Each log entry captures:
+            </p>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>The user account performing the action (name, email, and role)</li>
+              <li>The action type (login, logout, create, update, delete, approve, reject, restore, and similar)</li>
+              <li>The affected feature or record, along with a description and relevant metadata</li>
+              <li>The IP address, platform (web or Android app), browser, operating system, and device type</li>
+              <li>Date and time of the action</li>
+            </ul>
+            <p className="mt-3">
+              These logs are used for security monitoring, fraud and misuse detection, dispute resolution,
+              auditability of administrative actions, and service improvement. They may be accessed by
+              authorised administrators of the Platform and your institution for legitimate educational
+              and administrative purposes. Logs are retained as long as required for these purposes and in
+              accordance with applicable law. We do not use audit logs to profile or market to you, and we
+              do not sell log data to third parties.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">6. Data Retention</h2>
             <p>
               We retain your personal information for as long as your account is active or as needed to provide
               our services. Academic records may be retained for a longer period as required for educational
@@ -154,7 +192,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">6. Children&apos;s Privacy</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">7. Children&apos;s Privacy</h2>
             <p>
               The Smart Tutors platform is designed for students of all ages, including those under 13. We are
               committed to protecting children&apos;s privacy in compliance with applicable laws. For users under 13,
@@ -166,7 +204,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">7. Cookies &amp; Tracking</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Cookies &amp; Tracking</h2>
             <p>
               The Platform may use cookies and similar tracking technologies to maintain session state,
               remember preferences, and analyse usage patterns. Cookies are small data files stored on your
@@ -178,12 +216,12 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Your Rights</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">9. Your Rights</h2>
             <p className="mb-3">You have the following rights regarding your personal data:</p>
             <ul className="list-disc list-inside space-y-1.5">
               <li>
                 <span className="font-bold text-slate-700">Access:</span> Request a copy of all personal data we hold
-                about you.
+                about you, including the audit and activity logs associated with your account.
               </li>
               <li>
                 <span className="font-bold text-slate-700">Correction:</span> Request correction of inaccurate or
@@ -191,7 +229,9 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <span className="font-bold text-slate-700">Deletion:</span> Request deletion of your personal data,
-                subject to legal and institutional retention requirements.
+                subject to legal and institutional retention requirements. Audit logs are retained where
+                required for security, accountability, or legal compliance and may be anonymised or removed
+                where no such requirement applies.
               </li>
               <li>
                 <span className="font-bold text-slate-700">Opt-Out:</span> Manage notification preferences in your
@@ -201,7 +241,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">9. Third-Party Services</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">10. Third-Party Services</h2>
             <p>
               The Platform integrates with third-party services including Google Meet for live sessions, Firebase
               for authentication and cloud storage, and payment gateways for fee processing. Each third-party
@@ -212,7 +252,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">10. Changes to This Policy</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Changes to This Policy</h2>
             <p>
               We may update this Privacy Policy from time to time to reflect changes in our practices,
               technology, legal requirements, or other factors. When we make material changes, we will notify
@@ -223,7 +263,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Contact Us</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">12. Contact Us</h2>
             <p>
               If you have any questions, concerns, or requests regarding this Privacy Policy or our data
               practices, please contact us:

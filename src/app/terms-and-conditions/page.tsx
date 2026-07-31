@@ -22,7 +22,7 @@ export default function TermsAndConditionsPage() {
           </div>
           <div>
             <p className="text-xs font-bold text-slate-800">Smart Tutors Terms</p>
-            <p className="text-[10px] text-slate-400 font-medium">Last Updated: January 1, 2025</p>
+            <p className="text-[10px] text-slate-400 font-medium">Last Updated: July 31, 2026</p>
           </div>
         </div>
 
@@ -152,7 +152,30 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Certificates</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">8. Monitoring &amp; Audit Logging</h2>
+            <p className="mb-2">
+              The Platform records audit and activity logs of significant actions performed within it,
+              including but not limited to:
+            </p>
+            <ul className="list-disc list-inside space-y-1.5">
+              <li>Login and logout events, including timestamps and the account used</li>
+              <li>Creation, modification, and deletion of records, content, and account data</li>
+              <li>Approval, rejection, restoration, and bulk operations performed by administrators</li>
+              <li>Assessment submissions, attendance marking, feedback, and payment transactions</li>
+              <li>IP address, device type, operating system, browser, and approximate location</li>
+              <li>Notification, message, and communication activity</li>
+            </ul>
+            <p className="mt-3">
+              Audit logs are used for security monitoring, fraud and misuse detection, academic
+              accountability, dispute resolution, and service improvement. They may be reviewed by
+              authorised administrators of your institution. All activity on the Platform is attributed
+              to the logged-in account performing it. You are responsible for all actions taken through
+              your account, and you should report any unauthorised use to us immediately.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">9. Certificates</h2>
             <p>
               Digital certificates are issued upon successful completion of courses or programmes as
               determined by the institution. Certificates are digitally signed and verifiable through the
@@ -162,7 +185,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">9. AI-Powered Features</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">10. AI-Powered Features</h2>
             <p>
               The Platform includes AI-powered features such as the SmartTutors AI Chatbot and Quiz Arena.
               AI-generated content is provided for educational assistance and may not always be accurate,
@@ -174,7 +197,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">10. Third-Party Services</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Third-Party Services</h2>
             <p>
               The Platform integrates with third-party services including Google Meet for live sessions,
               Firebase for authentication, and payment gateways. Your use of these third-party services is
@@ -184,7 +207,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">11. Limitation of Liability</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">12. Limitation of Liability</h2>
             <p>
               To the maximum extent permitted by applicable law, Smart Tutors shall not be liable for any
               indirect, incidental, special, consequential, or punitive damages, or any loss of profits,
@@ -193,10 +216,21 @@ export default function TermsAndConditionsPage() {
               service. We are not liable for service interruptions, data loss, or third-party actions
               affecting the Platform.
             </p>
+            <p className="mt-3">
+              You are solely responsible for your conduct on the Platform and for any content you submit,
+              post, or transmit through it. Smart Tutors does not authorise, condone, or accept any
+              responsibility for wrongful, unlawful, or fraudulent activity carried out by users — including
+              academic dishonesty, impersonation, misuse of accounts, or abuse of the Platform&apos;s features.
+              Where such wrongdoing is detected (including through audit logs), we reserve the right to
+              suspend or terminate the offending account and to report the conduct to the relevant
+              institution or authorities. Smart Tutors assumes no responsibility for the consequences of
+              such user conduct or for any content generated, shared, or acted upon by users, including
+              decisions made based on AI-generated output.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">12. Termination</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">13. Termination</h2>
             <p>
               We reserve the right to suspend or terminate your account at any time if you violate these
               Terms, engage in fraudulent or harmful activity, or if required by your institution or by
@@ -207,7 +241,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">13. Governing Law &amp; Disputes</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">14. Governing Law &amp; Disputes</h2>
             <p>
               These Terms are governed by and construed in accordance with the laws of India. Any disputes
               arising from these Terms or your use of the Platform shall be subject to the exclusive
@@ -217,7 +251,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">14. Changes to Terms</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">15. Changes to Terms</h2>
             <p>
               Smart Tutors reserves the right to modify these Terms at any time. Significant changes will
               be communicated through the Platform via notification or email. The &quot;Last Updated&quot; date at
@@ -227,7 +261,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-slate-900 mb-2">15. Contact</h2>
+            <h2 className="text-sm font-bold text-slate-900 mb-2">16. Contact</h2>
             <p>
               If you have any questions about these Terms, please contact us:
             </p>

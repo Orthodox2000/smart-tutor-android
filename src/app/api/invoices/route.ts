@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 import crypto from 'crypto';
 
 function canManageFees(role: string | undefined) {
@@ -162,6 +163,18 @@ export async function POST(request: Request) {
     };
 
     await collection.insertOne(newInvoice);
+
+    logAction({
+      action: 'create',
+      category: 'fees',
+      details: `Invoice created (${title}) for ${studentId} — ₹${amount}`,
+      metadata: { invoiceId: newInvoice.id, studentId, amount, receiptNo },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
 
     return NextResponse.json({ feeInvoice: normalizeDoc(newInvoice) }, { status: 201 });
   } catch (error: any) {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function PATCH(request: Request) {
   const session = getSessionUser(request);
@@ -35,6 +36,18 @@ export async function PATCH(request: Request) {
     ).select('-password');
 
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    logAction({
+      action: 'update',
+      category: 'settings',
+      details: `Profile updated (${session.role})`,
+      metadata: { userId: session.id, fields: Object.keys(update) },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ user });
   } catch (error: any) {

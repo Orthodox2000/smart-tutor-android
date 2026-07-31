@@ -33,6 +33,15 @@ async function api(method, urlPath, body = null, extraHeaders = {}) {
 async function runTests() {
   console.log('\n\x1b[1m═══ SMART TUTORS — SECURITY TESTS ═══\x1b[0m\n');
 
+  // Setup: login as admin for authenticated write tests
+  let adminCookie = '';
+  try {
+    const res = await api('POST', '/api/auth/login', { login: 'admin@smarttutors.co.in', password: 'Admin@123', role: 'admin' });
+    const setCookie = res.headers.get('set-cookie');
+    if (setCookie) adminCookie = setCookie.split(';')[0];
+    log('Setup admin login succeeds', res.status === 200 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
+  } catch (e) { log('Setup admin login', 'FAIL', e.message); }
+
   // 1. SQL/NoSQL Injection
   console.log('\x1b[1m[1] Injection Protection\x1b[0m');
   try {
@@ -60,7 +69,7 @@ async function runTests() {
       content: '<img src=x onerror=alert(1)>',
       type: 'announcement',
       target: 'all'
-    });
+    }, { Cookie: adminCookie });
     const data = typeof res.data === 'object' ? res.data : {};
     log('XSS in message content handled', res.status < 500 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('XSS message test', 'FAIL', e.message); }
@@ -155,18 +164,18 @@ async function runTests() {
   // 10. Input Validation
   console.log('\n\x1b[1m[10] Input Validation\x1b[0m');
   try {
-    const res = await api('POST', '/api/auth/register', { username: '', password: 'test' });
+    const res = await api('POST', '/api/auth/signup', { username: '', password: 'test' });
     log('Empty username rejected', (res.status === 400 || res.status === 422) ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('Empty username', 'FAIL', e.message); }
 
   try {
-    const res = await api('POST', '/api/auth/register', { username: 'valid', password: '12' });
+    const res = await api('POST', '/api/auth/signup', { username: 'valid', password: '12' });
     log('Short password rejected', (res.status === 400 || res.status === 422) ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('Short password', 'FAIL', e.message); }
 
   try {
     const oversized = 'A'.repeat(10000);
-    const res = await api('POST', '/api/messages', { content: oversized, type: 'announcement', target: 'all' });
+    const res = await api('POST', '/api/messages', { content: oversized, type: 'announcement', target: 'all' }, { Cookie: adminCookie });
     log('Oversized payload handled', res.status < 500 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('Oversized payload', 'FAIL', e.message); }
 

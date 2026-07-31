@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 import crypto from 'crypto';
 
 export async function GET(request: Request) {
@@ -35,6 +36,19 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
     await col.insertOne(activity);
+
+    logAction({
+      action: 'create',
+      category: 'other',
+      details: `Daily activity created for student ${activity.studentId || 'unknown'}`,
+      metadata: { activityId: activity.id, studentId: activity.studentId },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json({ activity: normalizeDoc(activity) }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

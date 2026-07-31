@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Notification from '@/models/Notification';
 import jwt from 'jsonwebtoken';
+import { logAction } from '@/lib/audit-log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -11,7 +12,7 @@ function getSessionUser(request: Request) {
     const tokenMatch = cookieHeader.match(/smart_tutor_session=([^;]+)/);
     if (!tokenMatch) return null;
     const decoded = jwt.verify(tokenMatch[1], JWT_SECRET) as any;
-    return { id: decoded.id, uid: decoded.uid, role: decoded.role };
+    return { id: decoded.id, uid: decoded.uid, role: decoded.role, name: decoded.username || decoded.id };
   } catch {
     return null;
   }
@@ -20,6 +21,9 @@ function getSessionUser(request: Request) {
 export async function GET(request: Request) {
   try {
     const session = getSessionUser(request);
+    if (!session) {
+      return NextResponse.json({ error: 'Login required' }, { status: 401 });
+    }
 
     await connectToDatabase();
 
@@ -74,7 +78,32 @@ export async function POST(request: Request) {
       userIds: userIds || [],
     });
 
-    return NextResponse.json({ id: notification._id.toString(), success: true }, { status: 201 });
+    logAction({
+      action: 'create',
+      category: 'communication',
+      details: `Notification sent (${title})`,
+      metadata: { notificationId: notification._id?.toString?.(), title, type, audience },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
+    return NextResponse.json({
+      id: notification._id.toString(),
+      success: true,
+      createdCount: 1,
+      notifications: [{
+        id: notification._id.toString(),
+        title: notification.title,
+        message: notification.message,
+        type: notification.type || 'general',
+        link: notification.link || null,
+        read: false,
+        createdAt: notification.createdAt,
+      }],
+    }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -99,6 +128,18 @@ export async function PATCH(request: Request) {
       await Notification.findByIdAndUpdate(id, { $addToSet: { readBy: session.id } });
     }
 
+    logAction({
+      action: 'update',
+      category: 'communication',
+      details: `Notification marked ${read === false ? 'unread' : 'read'} (${id})`,
+      metadata: { notificationId: id, read: read !== false },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -118,6 +159,19 @@ export async function DELETE(request: Request) {
 
     await connectToDatabase();
     await Notification.findByIdAndDelete(id);
+
+    logAction({
+      action: 'delete',
+      category: 'communication',
+      details: `Notification deleted (${id})`,
+      metadata: { notificationId: id },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function POST(request: Request) {
   const session = getSessionUser(request);
@@ -18,6 +19,18 @@ export async function POST(request: Request) {
 
     user.deletedAt = new Date();
     await user.save();
+
+    logAction({
+      action: 'reject',
+      category: 'users',
+      details: `Student account rejected and soft-deleted (${user.name || userId})`,
+      metadata: { userId, softDelete: true },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ ok: true, message: 'Account rejected and deleted.' });
   } catch (error: any) {

@@ -62,7 +62,7 @@ cd ..
 echo.
 echo [6/7] Copying AAB to output folder...
 if not exist "output" mkdir output
-copy "android\app\build\outputs\bundle\release\app-release.aab" "output\SmartTutors-v1.5.0.aab"
+copy "android\app\build\outputs\bundle\release\app-release.aab" "output\SmartTutors-v1.6.0.aab"
 
 echo.
 echo [7/7] Building debug APK for testing...
@@ -75,7 +75,7 @@ echo.
 echo ═══════════════════════════════════════════════
 echo   BUILD COMPLETE
 echo.
-echo   Play Store AAB: output\SmartTutors-v1.5.0.aab
+echo   Play Store AAB: output\SmartTutors-v1.6.0.aab
 echo   Debug APK:      output\SmartTutors-debug.apk
 echo.
 echo   Upload the AAB to Google Play Console

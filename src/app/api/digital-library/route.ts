@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import LibraryItem from '@/models/LibraryItem';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function GET(request: Request) {
   try {
@@ -48,6 +49,19 @@ export async function POST(request: Request) {
     await connectToDatabase();
     const body = await request.json();
     const item = await LibraryItem.create(body);
+
+    logAction({
+      action: 'create',
+      category: 'library',
+      details: `Library book added (${body.title || 'Untitled'})`,
+      metadata: { bookId: item._id?.toString?.(), title: body.title, category: body.category },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json(item, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

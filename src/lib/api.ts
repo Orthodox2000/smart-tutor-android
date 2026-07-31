@@ -30,6 +30,10 @@ export async function apiFetch<T = any>(path: string, options: RequestInit = {})
     ...(options.headers as Record<string, string> || {}),
   };
 
+  if (isNative) {
+    headers['x-app-platform'] = 'android-app';
+  }
+
   if (isNative && authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function POST(request: Request) {
   const session = getSessionUser(request);
@@ -20,6 +21,18 @@ export async function POST(request: Request) {
     ).select('-password');
 
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+    logAction({
+      action: 'update',
+      category: 'users',
+      details: `Verification toggled for user ${userId} (verified: ${verified !== false})`,
+      metadata: { userId, verified: verified !== false },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ ok: true, message: verified !== false ? 'User verified.' : 'Verification removed.' });
   } catch (error: any) {

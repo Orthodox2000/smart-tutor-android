@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Report from '@/models/Report';
 import jwt from 'jsonwebtoken';
+import { logAction } from '@/lib/audit-log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here_1234567890';
 
@@ -56,6 +57,18 @@ export async function POST(request: Request) {
       description,
       messageContent: messageContent || undefined,
       status: 'pending',
+    });
+
+    logAction({
+      action: 'create',
+      category: 'moderation',
+      details: `Report submitted for ${targetType} (${targetName}) - ${reason}`,
+      metadata: { reportId: report._id.toString(), targetType, targetId, reason },
+      request,
+      userId: user.id || user.uid,
+      userName: user.username,
+      userRole: user.role,
+      statusCode: 200,
     });
 
     return NextResponse.json({ success: true, reportId: report._id });
@@ -137,6 +150,18 @@ export async function PATCH(request: Request) {
     if (!report) {
       return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
+
+    logAction({
+      action: 'update',
+      category: 'moderation',
+      details: `Report ${reportId} marked ${status}`,
+      metadata: { reportId, status },
+      request,
+      userId: user.id || user.uid,
+      userName: user.username,
+      userRole: user.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ success: true, report });
   } catch (error: any) {

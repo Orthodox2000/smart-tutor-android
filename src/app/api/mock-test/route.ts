@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import Test from '@/models/Test';
 import TestResult from '@/models/TestResult';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function POST(request: Request) {
   const session = getSessionUser(request);
@@ -33,6 +34,18 @@ export async function POST(request: Request) {
       totalQuestions: test.questions.length,
       correctAnswers: correctCount,
       answers,
+    });
+
+    logAction({
+      action: 'create',
+      category: 'exams',
+      details: `Mock test submitted (${test.title || testId}) - score ${score}%`,
+      metadata: { resultId: result._id.toString(), testId, score, correctCount },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
     });
 
     return NextResponse.json({

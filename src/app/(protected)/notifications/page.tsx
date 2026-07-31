@@ -31,10 +31,10 @@ export default function NotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      await apiFetch('/notifications', {
+      await apiFetch(`/notifications/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ read: true }),
       });
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     } catch (error) {
@@ -43,7 +43,7 @@ export default function NotificationsPage() {
 
   const deleteNotification = async (id: string) => {
     try {
-      await apiFetch(`/notifications?id=${id}`, { method: 'DELETE' });
+      await apiFetch(`/notifications/${id}`, { method: 'DELETE' });
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (error) {
     }

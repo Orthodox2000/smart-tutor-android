@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function POST(request: Request) {
   const session = getSessionUser(request);
@@ -22,6 +23,18 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString('base64');
     const dataUrl = `data:${file.type};base64,${base64}`;
+
+    logAction({
+      action: 'update',
+      category: 'performance',
+      details: `Student photo uploaded (${file.size} bytes)`,
+      metadata: { fileName: file.name, type: file.type, size: file.size },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     return NextResponse.json({ url: dataUrl });
   } catch (error: any) {

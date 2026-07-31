@@ -116,6 +116,11 @@ import type {
   CrmStaff,
   CrmStaffDesignation,
 } from "@/lib/crm-types";
+import type {
+  ActionLogEntry,
+  AuditLogFilter,
+  AuditLogStats,
+} from "@/lib/audit-log-types";
 
 type DashboardTemplate = {
   roleLabel: string;
@@ -246,6 +251,9 @@ feeInstallmentPlans: "feeInstallmentPlans",
 
   // Certificates
   certificates: "certificates",
+
+  // Audit Logs
+  actionLogs: "actionLogs",
 } as const;
 // ... (existing code)
 
@@ -9033,4 +9041,120 @@ export async function deleteDoubtAnswer(
   );
 
   return stripMongoId(answer);
+}
+
+export async function appendActionLogEntries(entries: Partial<ActionLogEntry>[]) {
+  if (!entries.length) return;
+  try {
+    const collection = await getCollection(COLLECTIONS.actionLogs);
+    await collection.insertMany(entries as any);
+  } catch (error) {
+    console.error("[audit-log] appendActionLogEntries failed:", error);
+  }
+}
+
+export async function getActionLogs(filter: AuditLogFilter = {}) {
+  const page = Math.max(1, Number(filter.page) || 1);
+  const limit = Math.min(200, Math.max(1, Number(filter.limit) || 50));
+
+  const query: Record<string, unknown> = {};
+
+  if (filter.action) query.action = filter.action;
+  if (filter.category) query.category = filter.category;
+  if (filter.ip) query.ip = filter.ip;
+  if (filter.userId) query.userId = filter.userId;
+
+  if (filter.dateFrom || filter.dateTo) {
+    const timestamp: Record<string, unknown> = {};
+    if (filter.dateFrom) timestamp.$gte = new Date(filter.dateFrom).toISOString();
+    if (filter.dateTo) {
+      const end = new Date(filter.dateTo);
+      end.setUTCHours(23, 59, 59, 999);
+      timestamp.$lte = end.toISOString();
+    }
+    query.timestamp = timestamp;
+  }
+
+  if (filter.search) {
+    const regex = { $regex: filter.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
+    query.$or = [
+      { details: regex },
+      { userName: regex },
+      { userEmail: regex },
+      { ip: regex },
+      { path: regex },
+      { action: regex },
+      { category: regex },
+    ];
+  }
+
+  const allowedSortColumns = ["timestamp", "action", "category", "userName", "ip"];
+  const sortBy = allowedSortColumns.includes(filter.sortBy || "")
+    ? (filter.sortBy as string)
+    : "timestamp";
+  const sortOrder = filter.sortOrder === "asc" ? 1 : -1;
+  const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder };
+  if (sortBy !== "timestamp") sort.timestamp = -1;
+
+  const collection = await getCollection<ActionLogEntry>(COLLECTIONS.actionLogs);
+  const total = await collection.countDocuments(query);
+  const documents = await collection
+    .find(query)
+    .sort(sort)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .toArray();
+
+  return {
+    logs: documents.map((doc) => stripMongoId(doc)),
+    pagination: { page, limit, total },
+  };
+}
+
+export async function getActionLogStats(): Promise<AuditLogStats> {
+  const collection = await getCollection<ActionLogEntry>(COLLECTIONS.actionLogs);
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const [total, todayCount, uniqueUsers, uniqueIps, byAction, byCategory] =
+    await Promise.all([
+      collection.countDocuments({}),
+      collection.countDocuments({ timestamp: { $gte: today.toISOString() } }),
+      collection.distinct("userId", { userId: { $ne: null } } as any),
+      collection.distinct("ip", { ip: { $ne: null } } as any),
+      collection
+        .aggregate<{ _id: string; count: number }>([
+          { $group: { _id: "$action", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ])
+        .toArray(),
+      collection
+        .aggregate<{ _id: string; count: number }>([
+          { $group: { _id: "$category", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ])
+        .toArray(),
+    ]);
+
+  const byActionMap: Record<string, number> = {};
+  byAction.forEach((item) => {
+    if (item._id) byActionMap[item._id] = item.count;
+  });
+
+  const byCategoryMap: Record<string, number> = {};
+  byCategory.forEach((item) => {
+    if (item._id) byCategoryMap[item._id] = item.count;
+  });
+
+  return {
+    totalLogs: total,
+    todayLogs: todayCount,
+    uniqueUsers: uniqueUsers.length,
+    uniqueIps: uniqueIps.length,
+    topAction: byAction[0]?._id || null,
+    topCategory: byCategory[0]?._id || null,
+    byAction: byActionMap,
+    byCategory: byCategoryMap,
+  };
 }

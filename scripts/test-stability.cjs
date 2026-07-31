@@ -33,7 +33,17 @@ async function api(method, path, body = null, cookie = '') {
 
 // ===== API STABILITY TESTS =====
 async function runTests() {
-  console.log('\n\x1b[1m═══ SMART TUTORS — STABILITY TESTS ═══\x1b[0m\n');
+  console.log('\n\x1b[1m⬢⬢⬢ SMART TUTORS — STABILITY TESTS ⬢⬢⬢\x1b[0m\n');
+
+  // 0. Setup: login to obtain a session cookie for protected endpoints
+  console.log('\x1b[1m[0] Setup Login\x1b[0m');
+  let sessionCookie = '';
+  try {
+    const res = await api('POST', '/api/auth/login', { login: 'riya@smarttutors.co.in', password: 'Student@123', role: 'student' });
+    const setCookie = res.headers.get('set-cookie');
+    if (setCookie) sessionCookie = setCookie.split(';')[0];
+    log('Setup login (riya@smarttutors.co.in) succeeds', res.status === 200 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
+  } catch (e) { log('Setup login', 'FAIL', e.message); }
 
   // 1. Health check
   console.log('\x1b[1m[1] Health & Connectivity\x1b[0m');
@@ -53,17 +63,17 @@ async function runTests() {
   } catch (e) { log('GET /api/sessions reachable', 'FAIL', e.message); }
 
   try {
-    const { status } = await api('GET', '/api/messages');
+    const { status } = await api('GET', '/api/messages', null, sessionCookie);
     log('GET /api/messages returns 200', status === 200 ? 'PASS' : 'FAIL', `Status: ${status}`);
   } catch (e) { log('GET /api/messages reachable', 'FAIL', e.message); }
 
   try {
-    const { status } = await api('GET', '/api/notifications');
+    const { status } = await api('GET', '/api/notifications', null, sessionCookie);
     log('GET /api/notifications returns 200', status === 200 ? 'PASS' : 'FAIL', `Status: ${status}`);
   } catch (e) { log('GET /api/notifications reachable', 'FAIL', e.message); }
 
   try {
-    const { status } = await api('GET', '/api/tests');
+    const { status } = await api('GET', '/api/tests', null, sessionCookie);
     log('GET /api/tests returns 200', status === 200 ? 'PASS' : 'FAIL', `Status: ${status}`);
   } catch (e) { log('GET /api/tests reachable', 'FAIL', e.message); }
 
@@ -78,10 +88,9 @@ async function runTests() {
   } catch (e) { log('GET /api/users reachable', 'FAIL', e.message); }
 
   // 2. Auth flow stability
-  console.log('\n\x1b[1m[2] Authentication Flow\x1b[0m');
-  let sessionCookie = '';
+  console.log('\x1b[1m[2] Authentication Flow\x1b[0m');
   try {
-    const res = await api('POST', '/api/auth/login', { login: 'demo_student', password: 'Student@123', role: 'student' });
+    const res = await api('POST', '/api/auth/login', { login: 'riya@smarttutors.co.in', password: 'Student@123', role: 'student' });
     log('POST /api/auth/login succeeds', res.status === 200 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
     const setCookie = res.headers.get('set-cookie');
     if (setCookie) sessionCookie = setCookie.split(';')[0];
@@ -118,20 +127,20 @@ async function runTests() {
   } catch (e) { log('/api/courses format', 'FAIL', e.message); }
 
   try {
-    const { data } = await api('GET', '/api/notifications');
+    const { data } = await api('GET', '/api/notifications', null, sessionCookie);
     const hasKey = data && (Array.isArray(data) || data.notifications);
     log('/api/notifications returns expected shape', hasKey ? 'PASS' : 'FAIL');
   } catch (e) { log('/api/notifications format', 'FAIL', e.message); }
 
   // 5. Error handling
-  console.log('\n\x1b[1m[5] Error Handling\x1b[0m');
+  console.log('\x1b[1m[5] Error Handling\x1b[0m');
   try {
-    const res = await api('DELETE', '/api/messages?id=nonexistent123');
+    const res = await api('DELETE', '/api/messages?id=nonexistent123', null, sessionCookie);
     log('DELETE non-existent returns ok or 404', (res.status === 200 || res.status === 404) ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('DELETE error handling', 'FAIL', e.message); }
 
   try {
-    const res = await api('GET', '/api/messages?role=invalid');
+    const res = await api('GET', '/api/messages?role=invalid', null, sessionCookie);
     log('Invalid query param handled', res.status < 500 ? 'PASS' : 'FAIL', `Status: ${res.status}`);
   } catch (e) { log('Invalid query param', 'FAIL', e.message); }
 

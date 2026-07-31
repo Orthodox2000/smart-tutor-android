@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 import crypto from 'crypto';
 
 export async function GET(request: Request) {
@@ -54,6 +55,18 @@ export async function POST(request: Request) {
     };
 
     await collection.insertOne(newFeedback);
+
+    logAction({
+      action: 'create',
+      category: 'feedback',
+      details: `Feedback created for student ${newFeedback.studentId || 'unknown'}`,
+      metadata: { feedbackId: newFeedback.id, type: newFeedback.type, studentId: newFeedback.studentId },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
 
     return NextResponse.json({ feedback: normalizeDoc(newFeedback) }, { status: 201 });
   } catch (error: any) {

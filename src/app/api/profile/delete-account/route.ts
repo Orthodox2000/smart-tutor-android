@@ -3,6 +3,7 @@ import connectToDatabase from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function POST(request: Request) {
   const session = getSessionUser(request);
@@ -26,6 +27,18 @@ export async function POST(request: Request) {
 
     user.deletedAt = new Date();
     await user.save();
+
+    logAction({
+      action: 'delete',
+      category: 'auth',
+      details: 'Admin account soft-deleted via profile delete',
+      metadata: { userId: session.id },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
 
     const response = NextResponse.json({ ok: true });
     response.cookies.set('smart_tutor_session', '', {

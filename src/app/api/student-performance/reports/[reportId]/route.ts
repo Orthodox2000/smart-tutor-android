@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getCollection, normalizeDoc } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function GET(request: Request, { params }: { params: Promise<{ reportId: string }> }) {
   const session = getSessionUser(request);
@@ -26,7 +27,20 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ r
   try {
     const { reportId } = await params;
     const col = await getCollection('performance_reports');
-    await col.deleteOne({ id: reportId });
+    const deleted = await col.deleteOne({ id: reportId });
+
+    logAction({
+      action: 'delete',
+      category: 'performance',
+      details: `Performance report deleted (${reportId})`,
+      metadata: { reportId },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Session from '@/models/Session';
 import { getSessionUser } from '@/lib/api-helpers';
+import { logAction } from '@/lib/audit-log';
 
 export async function GET(request: Request) {
   try {
@@ -47,6 +48,19 @@ export async function POST(request: Request) {
     const expiresAt = body.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000);
     
     const newSession = await Session.create({ ...body, expiresAt });
+
+    logAction({
+      action: 'create',
+      category: 'courses',
+      details: `Session created (${body.title || newSession._id.toString()})`,
+      metadata: { sessionId: newSession._id.toString(), title: body.title },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 201,
+    });
+
     return NextResponse.json(newSession, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
@@ -68,6 +82,19 @@ export async function PATCH(request: Request) {
     await connectToDatabase();
     const body = await request.json();
     const updated = await Session.findByIdAndUpdate(id, body, { new: true });
+
+    logAction({
+      action: 'update',
+      category: 'courses',
+      details: `Session updated (${id})`,
+      metadata: { sessionId: id, fields: Object.keys(body) },
+      request,
+      userId: session.id,
+      userName: session.name,
+      userRole: session.role,
+      statusCode: 200,
+    });
+
     return NextResponse.json(updated);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
